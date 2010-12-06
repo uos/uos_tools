@@ -42,7 +42,6 @@
 // Messages
 #include "sensor_msgs/PointCloud.h"
 
-
 /***
  * This a simple test app that requests a point cloud from the
  * point_cloud_assembler every 4 seconds, and then publishes the
@@ -83,7 +82,7 @@ public:
       return;
     }
 
-    if(e->position[0] > last_position_) {
+    if(!(e->position[0] < last_position_)) {
       last_position_ = e->position[0];
       return;
     }
