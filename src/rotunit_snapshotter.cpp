@@ -65,45 +65,45 @@ public:
     // Create the service client for calling the assembler
     client_ = n_.serviceClient<AssembleScans>("assemble_scans");
 
-    // Need to track if we've called the timerCallback at least once
     first_time_ = true;
+    arm_ = false;
   }
 
   void rotCallback(const sensor_msgs::JointState::ConstPtr& e)
   {
 
-    // We don't want to build a cloud the first callback, since we we
-    //   don't have a start and end time yet
-    if (first_time_)
-    {
-      first_time_ = false;
+    if(first_time_) {
       last_time_ = e->header.stamp;
-      last_position_ = e->position[0];
+      first_time_ = false;
       return;
     }
 
-    if(!(e->position[0] < last_position_)) {
-      last_position_ = e->position[0];
+    if(!arm_ && e->position[0] > 3) {
+      arm_ = true;
       return;
     }
 
-    // Populate our service request based on our timer callback times
-    AssembleScans srv;
-    srv.request.begin = last_time_;
-    srv.request.end   = e->header.stamp;
+    if(arm_ && e->position[0] > 0 && e->position[0] < 1) {
 
-    // Make the service call
-    if (client_.call(srv))
-    {
-      ROS_INFO("Published Cloud with %zu points", srv.response.cloud.points.size()) ;
-      pub_.publish(srv.response.cloud);
+      // Populate our service request based on our timer callback times
+      AssembleScans srv;
+      srv.request.begin = last_time_;
+      srv.request.end   = e->header.stamp;
+
+      // Make the service call
+      if (client_.call(srv))
+      {
+        ROS_INFO("Published Cloud with %zu points", srv.response.cloud.points.size()) ;
+        pub_.publish(srv.response.cloud);
+      }
+      else
+      {
+        ROS_ERROR("Error making service call\n") ;
+      }
+
+      arm_ = false;
+      last_time_ = e->header.stamp;
     }
-    else
-    {
-      ROS_ERROR("Error making service call\n") ;
-    }
-    last_time_ = e->header.stamp;
-    last_position_ = e->position[0];
   }
 
 private:
@@ -112,7 +112,7 @@ private:
   ros::Subscriber sub_;
   ros::ServiceClient client_;
   bool first_time_;
-  double last_position_;
+  bool arm_;
   ros::Time last_time_;
 } ;
 
