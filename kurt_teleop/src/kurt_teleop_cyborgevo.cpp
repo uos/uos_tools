@@ -9,7 +9,7 @@ void cyborgevoCallback(const joy::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
   vel.linear.x = max_vel_x * (joy->axes[2] + 1) / 2 * joy->axes[1];
-  vel.angular.x = max_rotational_vel * (joy->axes[2] + 1) / 2 * joy->axes[0];
+  vel.angular.z = max_rotational_vel * (joy->axes[2] + 1) / 2 * joy->axes[0];
   vel_pub.publish(vel);
 }
 
