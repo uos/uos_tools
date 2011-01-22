@@ -1,0 +1,16 @@
+<package>
+  <description brief="kurt_freespace">
+
+     kurt_freespace
+
+  </description>
+  <author>Jochen Sprickerhof</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/kurt_freespace</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
