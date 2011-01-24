@@ -68,8 +68,8 @@ int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
   for (i = 10; i < (laser->ranges.size() - 10); i++) {
     // new wegen der aufhaengung muss ein minimal wert ueberschritten sein
     // cout<<"sickscanner check range laser->ranges.size(): "<<laser->ranges.size()<<" distance "<<*distance<<" x["<<i<<"] "<<x[i]<<" y["<<i<<"] "<<y[i] <<" xregion "<<xregion<<" yregion "<<yregion<<endl;
-    double x = laser->ranges[i] * cos(laser->angle_min + i * laser->angle_increment);
-    double y = laser->ranges[i] * sin(laser->angle_min + i * laser->angle_increment);
+    double x = laser->ranges[i] * sin(laser->angle_min + i * laser->angle_increment);
+    double y = laser->ranges[i] * cos(laser->angle_min + i * laser->angle_increment);
     if (laser->ranges[i] > 0.1) { // damit wir auch nicht nur uns sehen
       if ((fabs(x) < xregion) && (y < yregion)) { // hier muessen wir uns etwas merken
         if (*distance_to_obstacle > y) {
