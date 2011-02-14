@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <link name="laser">
+    <visual>
+	    <geometry>
+	      <box size=".156 .155 .185" />
+	    </geometry>
+    	<material name="blue" >
+      		<color rgba="0 0 1 1" />
+    	</material>
+  	</visual>
+  </link>
+</robot>
