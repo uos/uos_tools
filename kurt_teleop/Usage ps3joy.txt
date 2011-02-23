@@ -1,0 +1,9 @@
+To use the PS3 game pad to controll Kurt, first the bluetooth dongle and
+the PS3 controller need to get paired.
+How to do this is shown at 
+http://www.ros.org/wiki/ps3joy/Tutorials/PairingJoystickAndBluetoothDongle
+In order to successfully activate the PS3 controller with the bluetoooth
+dongle under Ubuntu the /etc/buetooth/main.conf should contain 
+the following line:
+DisablePlugins = input
+

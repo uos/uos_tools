@@ -30,4 +30,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 rosbuild_add_executable(kurt_teleop_cyborgevo src/kurt_teleop_cyborgevo.cpp)
+rosbuild_add_executable(kurt_teleop_ps3joy src/kurt_teleop_ps3joy.cpp)
 rosbuild_add_executable(kurt_teleop_key src/kurt_teleop_key.cpp)
