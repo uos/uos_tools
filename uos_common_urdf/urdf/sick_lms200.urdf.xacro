@@ -4,12 +4,17 @@
 
   <link name="laser">
     <visual>
-	    <geometry>
-	      <box size=".156 .155 .185" />
-	    </geometry>
-    	<material name="blue" >
-      		<color rgba="0 0 1 1" />
-    	</material>
-  	</visual>
+      <geometry>
+        <box size=".156 .155 .185" />
+      </geometry>
+      <material name="blue" >
+        <color rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size=".156 .155 .185" />
+      </geometry>
+    </collision>
   </link>
 </robot>
