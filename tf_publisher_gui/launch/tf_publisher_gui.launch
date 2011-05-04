@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="tf_publisher_gui" type="tf_publisher_gui" name="tf_publisher_gui">
+    <param name="parent_frame" value="odom_combined" />
+    <param name="child_frame" value="base_link" />
+
+    <!-- the publishing rate in hz; optional, default: 10.0 -->
+    <param name="rate" value="100.0" />
+  </node>
+</launch>
