@@ -38,6 +38,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/String.h>
 
 #define KEYCODE_A 0x61
 #define KEYCODE_D 0x64
@@ -53,11 +54,14 @@
 #define KEYCODE_Q_CAP 0x51
 #define KEYCODE_E_CAP 0x45
 
+#define KEYCODE_SPACE 0x20
+
 class TeleopPR2Keyboard
 {
   private:
   double walk_vel, run_vel, yaw_rate, yaw_rate_run;
   geometry_msgs::Twist cmd;
+  std_msgs::String request;
 
   ros::NodeHandle n_;
   ros::Publisher vel_pub_;
@@ -68,6 +72,7 @@ class TeleopPR2Keyboard
     cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
 
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    req_pub  = n_.advertise<std_msgs::String>("request", 1);
 
     ros::NodeHandle n_private("~");
     n_private.param("walk_vel", walk_vel, 0.5);
@@ -109,6 +114,7 @@ void TeleopPR2Keyboard::keyboardLoop()
 {
   char c;
   bool dirty=false;
+  bool requested=false;
 
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
@@ -124,6 +130,7 @@ void TeleopPR2Keyboard::keyboardLoop()
   puts("Use 'WASD' to translate");
   puts("Use 'QE' to yaw");
   puts("Press 'Shift' to run");
+  puts("Press 'Space' to request a scan");
 
 
   for(;;)
@@ -190,6 +197,12 @@ void TeleopPR2Keyboard::keyboardLoop()
       cmd.angular.z = - yaw_rate_run;
       dirty = true;
       break;
+
+      //Requests
+    case KEYCODE_SPACE:
+      request.data = "scanRequest";
+      requested = true;
+      break;
     }
 
     
@@ -197,7 +210,9 @@ void TeleopPR2Keyboard::keyboardLoop()
     {
       vel_pub_.publish(cmd);
     }
-
+    if (requested) {
+      req_pub.publish(request);
+    }
 
   }
 }
