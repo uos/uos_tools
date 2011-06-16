@@ -65,6 +65,7 @@ class TeleopPR2Keyboard
 
   ros::NodeHandle n_;
   ros::Publisher vel_pub_;
+  ros::Publisher req_pub_;
 
   public:
   void init()
@@ -72,7 +73,7 @@ class TeleopPR2Keyboard
     cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
 
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    req_pub  = n_.advertise<std_msgs::String>("request", 1);
+    req_pub_ = n_.advertise<std_msgs::String>("request", 1);
 
     ros::NodeHandle n_private("~");
     n_private.param("walk_vel", walk_vel, 0.5);
@@ -211,7 +212,7 @@ void TeleopPR2Keyboard::keyboardLoop()
       vel_pub_.publish(cmd);
     }
     if (requested) {
-      req_pub.publish(request);
+      req_pub_.publish(request);
     }
 
   }
