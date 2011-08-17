@@ -210,9 +210,11 @@ void TeleopPR2Keyboard::keyboardLoop()
     if (dirty == true)
     {
       vel_pub_.publish(cmd);
+      dirty = false;
     }
     if (requested) {
       req_pub_.publish(request);
+      requested = false;
     }
 
   }
