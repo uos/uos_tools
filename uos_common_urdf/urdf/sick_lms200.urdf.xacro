@@ -17,6 +17,13 @@
         <!-- <box size=".156 .155 .185" />-->
       </geometry>
     </collision>
+    <inertial>
+      <mass value="2.0" />
+      <origin xyz="-0.022849644 0.000005772 0.040232937" />
+      <inertia ixx="0.009318238" ixy="-0.000000024" ixz="-0.000148360" 
+        iyy="0.009251799" iyz="0.000000400" 
+        izz="0.007478235" />
+    </inertial>
   </link>
 
   <gazebo reference="laser">
