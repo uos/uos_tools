@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<robot
+<robot xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
   <link name="laser">
@@ -28,5 +30,30 @@
 
   <gazebo reference="laser">
     <material value="Gazebo/Blue" />
+
+    <sensor:ray name="laser">
+      <rayCount>180</rayCount>
+      <rangeCount>180</rangeCount>
+      <laserCount>1</laserCount>
+
+      <origin>0.0 0.0 0.0</origin>
+      <displayRays>false</displayRays>
+
+      <minAngle>-90</minAngle>
+      <maxAngle>90</maxAngle>
+
+      <minRange>0.08</minRange>
+      <maxRange>10.0</maxRange>
+      <resRange>0.01</resRange>
+      <updateRate>75.0</updateRate>
+      <controller:gazebo_ros_laser name="gazebo_ros_laser_controller" plugin="libgazebo_ros_laser.so">
+        <gaussianNoise>0.005</gaussianNoise>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>75.0</updateRate>
+        <topicName>scan</topicName>
+        <frameName>laser</frameName>
+        <interface:laser name="gazebo_ros_laser_iface" />
+      </controller:gazebo_ros_laser>
+    </sensor:ray>
   </gazebo>
 </robot>
