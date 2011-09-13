@@ -4,5 +4,5 @@
     <param name="autorepeat_rate" value="10" />
   </node>
 
-  <node pkg="kurt_teleop" type="kurt_teleop_cyborgevo" name="kurt_teleop_cyborgevo" />
+  <node pkg="kurt_teleop" type="kurt_teleop_cyborgevo" name="kurt_teleop_cyborgevo" output="screen" />
 </launch>
