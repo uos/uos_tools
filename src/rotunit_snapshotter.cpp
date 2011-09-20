@@ -33,6 +33,7 @@
 *********************************************************************/
 
 #include <cstdio>
+#include <math.h>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 
@@ -69,6 +70,19 @@ public:
     arm_ = false;
   }
 
+  /**
+   * @return the index of the rotunit joint in the JointState message; -1 if not found
+   */
+  int getIndex(const sensor_msgs::JointState::ConstPtr& e)
+  {
+    for (size_t i = 0; i < e->name.size(); ++i)
+    {
+      if (e->name[i] == "laser_rot_joint")
+        return i;
+    }
+    return -1;
+  }
+
   void rotCallback(const sensor_msgs::JointState::ConstPtr& e)
   {
 
@@ -78,12 +92,18 @@ public:
       return;
     }
 
-    if(!arm_ && e->position[0] > 3) {
+    int index = getIndex(e);
+    if (index < 0)
+      return;
+
+    double position = fmod(e->position[index], 2 * M_PI);
+
+    if (!arm_ && position > 3) {
       arm_ = true;
       return;
     }
 
-    if(arm_ && e->position[0] > 0 && e->position[0] < 1) {
+    if(arm_ && position > 0 && position < 1) {
 
       // Populate our service request based on our timer callback times
       AssembleScans srv;
