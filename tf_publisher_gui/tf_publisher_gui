@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# based on element_state_publisher by David Lu!!
+# based on joint_state_publisher by David Lu!!
 
 import roslib; roslib.load_manifest('tf_publisher_gui')
 import rospy
