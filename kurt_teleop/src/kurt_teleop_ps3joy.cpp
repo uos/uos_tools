@@ -1,12 +1,12 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <joy/Joy.h>
+#include <sensor_msgs/Joy.h>
 
 double max_vel_x, max_rotational_vel;
 ros::Publisher vel_pub;
 double speed_multiplier;
 
-void ps3joyCallback(const joy::Joy::ConstPtr& joy)
+void ps3joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
   if (joy->buttons[8] == 1)   // check for full-speed button

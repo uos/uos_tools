@@ -9,7 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/kurt_teleop</url>
   <depend package="roscpp"/>
-  <depend package="joy"/>
+  <depend package="sensor_msgs"/>
   <depend package="geometry_msgs"/>
 
 </package>

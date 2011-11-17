@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/String.h>
-#include <joy/Joy.h>
+#include <sensor_msgs/Joy.h>
 
 double max_vel_x, max_rotational_vel;
 ros::Publisher vel_pub;
@@ -10,7 +10,7 @@ std_msgs::String request;
 
 bool requesting;
 
-void cyborgevoCallback(const joy::Joy::ConstPtr& joy)
+void cyborgevoCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
   vel.linear.x = max_vel_x * (joy->axes[2] + 1) / 2 * joy->axes[1];
