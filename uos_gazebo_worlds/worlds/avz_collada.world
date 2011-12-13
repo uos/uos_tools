@@ -95,10 +95,10 @@
    <body:trimesh name="avz_map_body">
      <geom:trimesh name="avz_map_geom">
        <scale>1.0 1.0 1.0</scale>
-       <mesh>avz_neu.dae</mesh>
+       <mesh>avz_neu_no-roof_no-floor_no-lamps_simplified.dae</mesh>
        <visual>
          <scale>1.0 1.0 1.0</scale>
-         <mesh>avz_neu.dae</mesh>
+         <mesh>avz_neu_no-roof_no-floor_no-lamps_simplified.dae</mesh>
        </visual>
      </geom:trimesh>
    </body:trimesh>
