@@ -36,8 +36,8 @@
 
     <joint name="${camera}_depth_joint" type="fixed">
       <origin xyz="0 0.018 0" rpy="0 0 0" />
-      <parent link="kinect_link" />
-      <child link="kinect_depth_origin" />
+      <parent link="${camera}_link" />
+      <child link="${camera}_depth_origin" />
     </joint>
 
     <link name="${camera}_depth_origin">
@@ -52,8 +52,8 @@
 
     <joint name="${camera}_depth_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-      <parent link="kinect_depth_origin" />
-      <child link="kinect_depth" />
+      <parent link="${camera}_depth_origin" />
+      <child link="${camera}_depth" />
     </joint>
 
     <link name="${camera}_depth">
@@ -67,8 +67,8 @@
 
     <joint name="${camera}_rgb_joint" type="fixed">
       <origin xyz="0 -0.005 0" rpy="0 0 0" />
-      <parent link="kinect_link" />
-      <child link="kinect_rgb" />
+      <parent link="${camera}_link" />
+      <child link="${camera}_rgb" />
     </joint>
 
     <link name="${camera}_rgb">
