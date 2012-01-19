@@ -37,10 +37,10 @@
     <joint name="${camera}_depth_joint" type="fixed">
       <origin xyz="0 0.018 0" rpy="0 0 0" />
       <parent link="${camera}_link" />
-      <child link="${camera}_depth_origin" />
+      <child link="${camera}_depth_frame" />
     </joint>
 
-    <link name="${camera}_depth_origin">
+    <link name="${camera}_depth_frame">
       <inertial>
         <mass value="0.000001" />
         <origin xyz="0 0 0" />
@@ -52,11 +52,11 @@
 
     <joint name="${camera}_depth_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-      <parent link="${camera}_depth_origin" />
-      <child link="${camera}_depth" />
+      <parent link="${camera}_depth_frame" />
+      <child link="${camera}_depth_optical_frame" />
     </joint>
 
-    <link name="${camera}_depth">
+    <link name="${camera}_depth_optical_frame">
       <inertial>
         <mass value="0.000001" />
         <origin xyz="0 0 0" />
@@ -68,16 +68,31 @@
     <joint name="${camera}_rgb_joint" type="fixed">
       <origin xyz="0 -0.005 0" rpy="0 0 0" />
       <parent link="${camera}_link" />
-      <child link="${camera}_rgb" />
+      <child link="${camera}_rgb_frame" />
     </joint>
 
-    <link name="${camera}_rgb">
+    <link name="${camera}_rgb_frame">
       <inertial>
         <mass value="0.000001" />
         <origin xyz="0 0 0" />
         <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
           iyy="0.0001" iyz="0.0"
           izz="0.0001" />
+      </inertial>
+    </link>
+
+    <joint name="${camera}_rgb_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+      <parent link="${camera}_rgb_frame" />
+      <child link="${camera}_rgb_optical_frame" />
+    </joint>
+
+    <link name="${camera}_rgb_optical_frame">
+      <inertial>
+        <mass value="0.000001" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+          iyy="0.0001" iyz="0.0" izz="0.0001" />
       </inertial>
     </link>
   </xacro:macro>
