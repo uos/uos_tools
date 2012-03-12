@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  >
+
+  <include filename="$(find kurt_description)/common.xacro" />
+
+  <xacro:property name="laser_x" value="0.105" />
+  <xacro:property name="laser_y" value="0.102" />
+  <xacro:property name="laser_z" value="0.152" />
+  <xacro:property name="laser_mass" value="1.1" />
+
+  <link name="laser">
+    <visual>
+      <geometry>
+        <mesh filename="package://kurt_description/meshes/sick_lms-100.stl" />
+        <!-- <box size="${laser_x} ${laser_y} ${laser_z}" /> -->
+      </geometry>
+      <material name="blue" >
+        <color rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://kurt_description/meshes/sick_lms-100.stl" />
+        <!-- <box size="${laser_x} ${laser_y} ${laser_z}" /> -->
+      </geometry>
+    </collision>
+    <xacro:box_inertial x="${laser_x}" y="${laser_y}" z="${laser_z}" mass="${laser_mass}" />
+  </link>
+
+
+  <gazebo reference="laser">
+    <material value="Gazebo/Blue" />
+    <sensor:ray name="laser">
+      <rayCount>1080</rayCount>
+      <rangeCount>1080</rangeCount>
+      <laserCount>1</laserCount>
+
+      <origin>0.0 0.0 0.0</origin>
+      <displayRays>false</displayRays>
+
+      <minAngle>-135</minAngle>
+      <maxAngle>135</maxAngle>
+
+      <minRange>0.5</minRange>
+      <maxRange>20.0</maxRange>
+      <resRange>0.01</resRange>
+      <updateRate>25.0</updateRate>
+      <controller:gazebo_ros_laser name="gazebo_ros_laser_controller" plugin="libgazebo_ros_laser.so">
+        <gaussianNoise>0.0042</gaussianNoise>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>25.0</updateRate>
+        <topicName>scan</topicName>
+        <frameName>laser</frameName>
+        <interface:laser name="gazebo_ros_laser_iface" />
+      </controller:gazebo_ros_laser>
+    </sensor:ray>
+  </gazebo>
+</robot>
