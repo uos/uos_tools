@@ -17,6 +17,8 @@
   <depend package="gazebo_plugins"/>
   <depend package="pr2_gazebo_plugins"/>
   <depend package="kurt_gazebo_plugins"/>
+
+  <depend package="katana_description"/>
 </package>
 
 
