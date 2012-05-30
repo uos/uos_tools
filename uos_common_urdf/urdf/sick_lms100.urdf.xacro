@@ -45,7 +45,7 @@
       <minAngle>-135</minAngle>
       <maxAngle>135</maxAngle>
 
-      <minRange>0.5</minRange>
+      <minRange>0.05</minRange>
       <maxRange>20.0</maxRange>
       <resRange>0.01</resRange>
       <updateRate>25.0</updateRate>
