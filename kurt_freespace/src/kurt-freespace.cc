@@ -170,8 +170,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns("~");
 
-  nh_ns.param("max_vel_x", max_vel_x, 1.5);
-  nh_ns.param("max_rotational_vel", max_rotational_vel, 3.0);
+  nh_ns.param("max_vel_x", max_vel_x, 0.9);
+  nh_ns.param("max_rotational_vel", max_rotational_vel, 1.0);
 
   vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   ros::Subscriber laser_sub = nh.subscribe("scan", 10, autonomous_behave);
