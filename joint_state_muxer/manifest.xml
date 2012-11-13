@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/joint_state_muxer</url>
 
+  <depend package="urdf_python" />
+
 </package>
 
 
