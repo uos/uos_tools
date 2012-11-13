@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import roslib; roslib.load_manifest('kurtana_joint_state_publisher')
+import roslib; roslib.load_manifest('joint_state_muxer')
 import rospy
 from sensor_msgs.msg import JointState
 from urdf_python.urdf import URDF
