@@ -7,8 +7,10 @@
   name="${camera}">
 
   <include filename="$(find kurt_description)/common.xacro" />
+  <include filename="$(find kurt_description)/parts/openni.gazebo.xacro" />
 
   <xacro:macro name="kinect" params="camera">
+
     <link name="${camera}_link">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -16,14 +18,12 @@
           <mesh filename="package://kurt_description/meshes/kinect/kinect.dae"/>
         </geometry>
       </visual>
-
       <collision>
         <origin xyz="-0.0315 0 -0.017" rpy="0 0 0" />
         <geometry>
           <box size="0.0730 0.2760 0.0720"/>
         </geometry>
       </collision>
-
       <xacro:box_inertial x="0.0730" y="0.2760" z="0.0720" mass="0.430" />
     </link>
 
@@ -32,7 +32,6 @@
       <parent link="${camera}_link" />
       <child link="${camera}_depth_frame" />
     </joint>
-
     <link name="${camera}_depth_frame">
       <inertial>
         <mass value="0.000001" />
@@ -48,7 +47,6 @@
       <parent link="${camera}_depth_frame" />
       <child link="${camera}_depth_optical_frame" />
     </joint>
-
     <link name="${camera}_depth_optical_frame">
       <inertial>
         <mass value="0.000001" />
@@ -58,12 +56,14 @@
       </inertial>
     </link>
 
+    <!-- OpenNI IR sensor Gazebo extensions -->
+    <xacro:openni_ir_gazebo_v0 link_name="${camera}_depth_frame" frame_name="${camera}_depth_optical_frame" camera_name="${camera}" />
+
     <joint name="${camera}_rgb_joint" type="fixed">
       <origin xyz="0 -0.005 0" rpy="0 0 0" />
       <parent link="${camera}_link" />
       <child link="${camera}_rgb_frame" />
     </joint>
-
     <link name="${camera}_rgb_frame">
       <inertial>
         <mass value="0.000001" />
@@ -79,7 +79,6 @@
       <parent link="${camera}_rgb_frame" />
       <child link="${camera}_rgb_optical_frame" />
     </joint>
-
     <link name="${camera}_rgb_optical_frame">
       <inertial>
         <mass value="0.000001" />
@@ -88,5 +87,9 @@
           iyy="0.0001" iyz="0.0" izz="0.0001" />
       </inertial>
     </link>
+
+    <!-- OpenNI RGB sensor Gazebo extensions -->
+    <xacro:openni_rgb_gazebo_v0 link_name="${camera}_rgb_frame" frame_name="${camera}_rgb_optical_frame" camera_name="${camera}" />
+
   </xacro:macro>
 </robot>
