@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="dev" default="/dev/input/js0" />
+
   <node pkg="joy" type="joy_node" name="joy_node">
     <param name="autorepeat_rate" value="10" />
+    <param name="dev" value="$(arg dev)" />
   </node>
 
   <node pkg="kurt_teleop" type="kurt_teleop_cyborgevo" name="kurt_teleop_cyborgevo" output="screen" />
