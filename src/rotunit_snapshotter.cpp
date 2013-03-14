@@ -38,10 +38,10 @@
 #include <sensor_msgs/JointState.h>
 
 // Services
-#include "laser_assembler/AssembleScans.h"
+#include "laser_assembler/AssembleScans2.h"
 
 // Messages
-#include "sensor_msgs/PointCloud.h"
+#include "sensor_msgs/PointCloud2.h"
 
 /***
  * This a simple test app that requests a point cloud from the
@@ -59,12 +59,12 @@ public:
   PeriodicSnapshotter()
   {
     // Create a publisher for the clouds that we assemble
-    pub_ = n_.advertise<sensor_msgs::PointCloud> ("assembled_cloud", 1);
+    pub_ = n_.advertise<sensor_msgs::PointCloud2> ("assembled_cloud", 1);
 
     sub_ = n_.subscribe("joint_states", 1000, &PeriodicSnapshotter::rotCallback, this);
 
     // Create the service client for calling the assembler
-    client_ = n_.serviceClient<AssembleScans>("assemble_scans");
+    client_ = n_.serviceClient<AssembleScans2>("assemble_scans2");
 
     first_time_ = true;
     arm_ = false;
@@ -106,14 +106,14 @@ public:
     if(arm_ && position > 0 && position < 1) {
 
       // Populate our service request based on our timer callback times
-      AssembleScans srv;
+      AssembleScans2 srv;
       srv.request.begin = last_time_;
       srv.request.end   = e->header.stamp;
 
       // Make the service call
       if (client_.call(srv))
       {
-        ROS_INFO("Published Cloud with %zu points", srv.response.cloud.points.size()) ;
+        ROS_INFO("Published Cloud with %zu points", srv.response.cloud.width * srv.response.cloud.height) ;
         pub_.publish(srv.response.cloud);
       }
       else
@@ -144,9 +144,9 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "rotunit_snapshotter");
   ros::NodeHandle n;
-  ROS_INFO("Waiting for [build_cloud] to be advertised");
-  ros::service::waitForService("build_cloud");
-  ROS_INFO("Found build_cloud! Starting the snapshotter");
+  ROS_INFO("Waiting for [assemble_scans2] to be advertised");
+  ros::service::waitForService("assemble_scans2");
+  ROS_INFO("Found assemble_scans2! Starting the snapshotter");
   PeriodicSnapshotter snapshotter;
   ros::spin();
   return 0;
