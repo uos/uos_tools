@@ -32,8 +32,8 @@
     <material value="Gazebo/Blue" />
 
     <sensor:ray name="laser">
-      <rayCount>180</rayCount>
-      <rangeCount>180</rangeCount>
+      <rayCount>181</rayCount>
+      <rangeCount>181</rangeCount>
       <laserCount>1</laserCount>
 
       <origin>0.0 0.0 0.0</origin>
