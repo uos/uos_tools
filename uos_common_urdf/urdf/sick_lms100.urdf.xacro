@@ -31,32 +31,35 @@
     <xacro:box_inertial x="${laser_x}" y="${laser_y}" z="${laser_z}" mass="${laser_mass}" />
   </link>
 
-
   <gazebo reference="laser">
     <material value="Gazebo/Blue" />
-    <sensor:ray name="laser">
-      <rayCount>1080</rayCount>
-      <rangeCount>1080</rangeCount>
-      <laserCount>1</laserCount>
 
-      <origin>0.0 0.0 0.0</origin>
-      <displayRays>false</displayRays>
-
-      <minAngle>-135</minAngle>
-      <maxAngle>135</maxAngle>
-
-      <minRange>0.10</minRange>
-      <maxRange>20.0</maxRange>
-      <resRange>0.01</resRange>
-      <updateRate>25.0</updateRate>
-      <controller:gazebo_ros_laser name="gazebo_ros_laser_controller" plugin="libgazebo_ros_laser.so">
-        <gaussianNoise>0.0042</gaussianNoise>
-        <alwaysOn>true</alwaysOn>
-        <updateRate>25.0</updateRate>
-        <topicName>scan</topicName>
+    <sensor type="ray" name="laser">
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <topic>scan</topic>
+      <update_rate>25.0</update_rate>
+      <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_laser.so">
         <frameName>laser</frameName>
-        <interface:laser name="gazebo_ros_laser_iface" />
-      </controller:gazebo_ros_laser>
-    </sensor:ray>
+        <topicName>scan</topicName>
+        <gaussianNoise>0.0042</gaussianNoise>
+        <updateRate>25.0</updateRate>
+      </plugin>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1081</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.356</min_angle>
+            <max_angle>2.356</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>20.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+    </sensor>
   </gazebo>
 </robot>
