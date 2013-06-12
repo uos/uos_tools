@@ -16,7 +16,7 @@
 
   <depend package="gazebo_plugins"/>
   <depend package="pr2_gazebo_plugins"/>
-  <depend package="kurt_gazebo_plugins"/>
+  <depend package="diffdrive_gazebo_plugin"/>
 </package>
 
 
