@@ -4,6 +4,7 @@
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/uos_tools</url>
+  <depend stack="joystick_drivers" /> <!-- joy -->
   <depend stack="ros" />
 
 </stack>
