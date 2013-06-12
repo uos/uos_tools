@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot
+  xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <include filename="$(find uos_common_urdf)/common.xacro" />
+
+  <xacro:property name="laser_x" value="0.156" />
+  <xacro:property name="laser_y" value="0.155" />
+  <xacro:property name="laser_z" value="0.185" />
+  <xacro:property name="laser_mass" value="2.0" />
+
+  <link name="laser">
+    <visual>
+	    <geometry>
+        <box size="${laser_x} ${laser_y} ${laser_z}" />
+	    </geometry>
+    	<material name="blue" >
+      		<color rgba="0 0 1 1" />
+    	</material>
+    </visual>
+    <xacro:box_inertial x="${laser_x}" y="${laser_y}" z="${laser_z}" mass="${laser_mass}" />
+  </link>
+</robot>
