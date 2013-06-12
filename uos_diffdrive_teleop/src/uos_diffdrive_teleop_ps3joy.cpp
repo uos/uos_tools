@@ -41,7 +41,7 @@ void ps3joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "kurt_teleop_ps3joy");
+  ros::init(argc, argv, "uos_diffdrive_teleop_ps3joy");
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns("~");
