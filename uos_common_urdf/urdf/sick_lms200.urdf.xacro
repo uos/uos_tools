@@ -7,7 +7,7 @@
   <link name="laser">
     <visual>
       <geometry>
-        <mesh filename="package://kurt_description/meshes/sick_lms-200.stl" />
+        <mesh filename="package://uos_common_urdf/meshes/sick_lms-200.stl" />
       </geometry>
       <material name="blue" >
         <color rgba="0 0 1 1" />
@@ -15,7 +15,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://kurt_description/meshes/sick_lms-200.stl" />
+        <mesh filename="package://uos_common_urdf/meshes/sick_lms-200.stl" />
         <!-- <box size=".156 .155 .185" />-->
       </geometry>
     </collision>
