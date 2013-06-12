@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="ps3joy" type="ps3joy.py" name="ps3joy" output="screen" launch-prefix="sudo" />
+  <node pkg="joy" type="joy_node" name="joy_node">
+    <param name="autorepeat_rate" value="10" />
+    <param name="dev" value="/dev/input/js1" />
+  </node>
+
+  <node pkg="kurt_teleop" type="kurt_teleop_ps3joy" name="kurt_teleop_ps3joy" output="screen" />
+</launch>
