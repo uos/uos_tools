@@ -7,5 +7,5 @@
     <param name="dev" value="$(arg dev)" />
   </node>
 
-  <node pkg="kurt_teleop" type="kurt_teleop_cyborgevo" name="kurt_teleop_cyborgevo" output="screen" />
+  <node pkg="uos_diffdrive_teleop" type="uos_diffdrive_teleop_cyborgevo" name="uos_diffdrive_teleop_cyborgevo" output="screen" />
 </launch>

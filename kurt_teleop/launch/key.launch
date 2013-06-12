@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <node pkg="kurt_teleop" type="kurt_teleop_key" name="kurt_teleop_key" output="screen"/>
-</launch>

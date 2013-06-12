@@ -26,7 +26,7 @@ void cyborgevoCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "kurt_teleop_cyborgevo");
+  ros::init(argc, argv, "uos_diffdrive_teleop_cyborgevo");
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns("~");

@@ -99,7 +99,7 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "kurt_teleop_key");
+  ros::init(argc, argv, "uos_diffdrive_teleop_key");
 
   TeleopPR2Keyboard tpk;
   tpk.init();
