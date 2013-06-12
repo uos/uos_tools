@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <link name="laser">
+    <visual>
+      <geometry>
+        <mesh filename="package://uos_common_urdf/meshes/sick_lms-200.stl" />
+      </geometry>
+      <material name="blue" >
+        <color rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://uos_common_urdf/meshes/sick_lms-200.stl" />
+        <!-- <box size=".156 .155 .185" />-->
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0" />
+      <origin xyz="-0.022849644 0.000005772 0.040232937" />
+      <inertia ixx="0.009318238" ixy="-0.000000024" ixz="-0.000148360" 
+        iyy="0.009251799" iyz="0.000000400" 
+        izz="0.007478235" />
+    </inertial>
+  </link>
+
+  <gazebo reference="laser">
+    <material value="Gazebo/Blue" />
+
+    <sensor:ray name="laser">
+      <rayCount>181</rayCount>
+      <rangeCount>181</rangeCount>
+      <laserCount>1</laserCount>
+
+      <origin>0.0 0.0 0.0</origin>
+      <displayRays>false</displayRays>
+
+      <minAngle>-90</minAngle>
+      <maxAngle>90</maxAngle>
+
+      <minRange>0.08</minRange>
+      <maxRange>10.0</maxRange>
+      <resRange>0.01</resRange>
+      <updateRate>75.0</updateRate>
+      <controller:gazebo_ros_laser name="gazebo_ros_laser_controller" plugin="libgazebo_ros_laser.so">
+        <gaussianNoise>0.005</gaussianNoise>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>75.0</updateRate>
+        <topicName>scan</topicName>
+        <frameName>laser</frameName>
+        <interface:laser name="gazebo_ros_laser_iface" />
+      </controller:gazebo_ros_laser>
+    </sensor:ray>
+  </gazebo>
+</robot>
