@@ -105,7 +105,7 @@ class JointStateMuxer():
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('joint_state_publisher')
+        rospy.init_node('joint_state_muxer')
         jsp = JointStateMuxer()
         jsp.loop()
 
