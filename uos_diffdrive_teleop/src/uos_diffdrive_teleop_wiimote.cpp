@@ -25,7 +25,7 @@ void ps3joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
 
-  int c; // assigning three cases based on three buttons on the wii remote
+  int c = 0; // assigning three cases based on three buttons on the wii remote
   if (joy->buttons[0])
     c = 1;
   else if (joy->buttons[1])
