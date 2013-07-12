@@ -1,0 +1,15 @@
+<package>
+  <description brief="simple_approximate_time_synchronizer">
+
+    simple_approximate_time_synchronizer
+
+  </description>
+  <author>Michael Goerner</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/simple_approximate_time_synchronizer</url>
+
+  <depend package="rospy" />
+  <depend package="message_filters" />
+
+</package>
