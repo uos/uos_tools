@@ -1,0 +1,17 @@
+<package>
+  <description brief="acc_finder">
+
+    This package contains two small tools to help configure the navigation pipeline. The node min_max_finder.py prints the minimum and maximum linear and angular speed of the robot; the node acc_finder.py prints the time needed to achieve maximum speed.
+
+  </description>
+  <author>Martin Günther</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/acc_finder</url>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+  <depend package="nav_msgs"/>
+
+</package>
+
+
