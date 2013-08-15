@@ -1,0 +1,17 @@
+<package>
+  <description brief="move_base_straight">
+
+     move_base_straight
+
+  </description>
+  <author>tgedicke</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/actions</url>
+  <depend package="actionlib"/>
+  <depend package="rospy"/>
+  <depend package="tf"/>
+  <depend package="std_msgs"/>
+  <depend package="actionlib_msgs"/>
+  <depend package="move_base_msgs"/>
+</package>
