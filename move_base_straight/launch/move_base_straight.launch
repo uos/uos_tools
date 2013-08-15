@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<launch>
+  <node name="move_base_straight" pkg="move_base_straight" type="move_base_straight.py" output="screen" />
+</launch>
