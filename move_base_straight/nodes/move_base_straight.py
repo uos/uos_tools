@@ -41,7 +41,7 @@ class MoveBaseStraightAction(object):
         self.REQUIRED_APERTURE = rospy.get_param('~required_aperture', np.pi * 0.75) # [rad]
 
         # We can also listen for PoseStamped targets on some topic.
-        self.GOAL_TOPIC = rospy.get_param('~goal_topic', False)
+        self.GOAL_TOPIC_NAME = rospy.get_param('~goal_topic_name', None)
         # ----------------------------------------------------------------------
 
         self.action_name = name
@@ -68,11 +68,11 @@ class MoveBaseStraightAction(object):
         self.action_server.start()
         rospy.loginfo('%s: Action server up and running...' % (self.action_name))
 
-        if self.GOAL_TOPIC:
+        if self.GOAL_TOPIC_NAME:
             self.client = actionlib.SimpleActionClient('move_base_straight', MoveBaseAction)
             self.client.wait_for_server()
-            rospy.Subscriber(self.GOAL_TOPIC, PoseStamped, self.manual_cb)
-            rospy.loginfo('%s: Manual control topic is: %s' % (self.action_name, self.GOAL_TOPIC))
+            rospy.Subscriber(self.GOAL_TOPIC_NAME, PoseStamped, self.manual_cb)
+            rospy.loginfo('%s: Manual control topic is: %s' % (self.action_name, self.GOAL_TOPIC_NAME))
 
     def laser_to_base(self, distance_laser, angle_laser):
         """
