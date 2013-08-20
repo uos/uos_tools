@@ -52,11 +52,14 @@ class MoveBaseStraightAction(object):
         self.scan = None
         rospy.Subscriber("/base_scan", LaserScan, self.laser_cb)
 
+        footprint_frame = rospy.get_param('~footprint_frame', '/base_footprint')
+        laser_frame = rospy.get_param('~laser_frame', '/base_laser_link')
+
         # Get base laser to base footprint frame offset
         while not rospy.is_shutdown():
             try:
-                self.tf_listener.waitForTransform('/base_footprint', '/base_laser_link', rospy.Time(), rospy.Duration(1.0))
-                self.LASER_BASE_OFFSET = self.tf_listener.lookupTransform('/base_footprint', '/base_laser_link', rospy.Time())[0][0]
+                self.tf_listener.waitForTransform(footprint_frame, laser_frame, rospy.Time(), rospy.Duration(1.0))
+                self.LASER_BASE_OFFSET = self.tf_listener.lookupTransform(footprint_frame, laser_frame, rospy.Time())[0][0]
                 break
             except (tf.LookupException, tf.ConnectivityException) as e:
                 rospy.logwarn("MoveBaseBlind tf exception! Message: %s" % e.message)
