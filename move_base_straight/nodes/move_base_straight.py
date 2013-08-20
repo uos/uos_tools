@@ -96,6 +96,11 @@ class MoveBaseStraightAction(object):
         self.client.send_goal(goal)
 
     def execute_cb(self, goal):
+        if not self.scan:
+            rospy.logwarn('No messaged received yet on topic %s, aborting goal!' % rospy.resolve_name('base_scan'))
+            self.action_server.set_aborted()
+            return
+
         # helper variables
         success = False
         target_pose = goal.target_pose
