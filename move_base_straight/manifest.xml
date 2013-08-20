@@ -4,10 +4,10 @@
      move_base_straight
 
   </description>
-  <author>tgedicke</author>
+  <author>Thorsten Gedicke</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/actions</url>
+  <url>http://ros.org/wiki/move_base_straight</url>
   <depend package="actionlib"/>
   <depend package="rospy"/>
   <depend package="tf"/>
