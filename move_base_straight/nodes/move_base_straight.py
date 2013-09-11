@@ -30,7 +30,7 @@ class MoveBaseStraightAction(object):
 
         # Tolerance for movement success (action returns aborted if
         # distance to goal is still above this after we stopped)
-        self.MAX_SUCCESS_RANGE = rospy.get_param('~max_success_range', 0.2) # [m]
+        self.GOAL_THRESHOLD_ACCEPTABLE = rospy.get_param('~goal_threshold_acceptable', 0.2) # [m]
 
         # Minimal safety radius around base footprint
         self.RANGE_MINIMUM = rospy.get_param('~range_minimum', 0.5) # [m]
@@ -173,7 +173,7 @@ class MoveBaseStraightAction(object):
                 # send command to stop
                 self.cmd_vel_pub.publish(Twist())
                 rospy.logwarn('%s: Blocked! Distance to goal: %s m. Critical object distance of %s m at angle %s (%s angle difference to goal direction)' % (self.action_name, dist, block_reason[0], block_reason[1], block_reason[2]))
-                if(dist <= self.MAX_SUCCESS_RANGE):
+                if(dist <= self.GOAL_THRESHOLD_ACCEPTABLE):
                     rospy.logwarn('%s: Succeeded' % self.action_name)
                     self.action_server.set_succeeded()
                 else:
