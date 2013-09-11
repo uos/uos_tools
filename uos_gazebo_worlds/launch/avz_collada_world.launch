@@ -1,8 +1,21 @@
+<?xml version="1.0"?>
 <launch>
 
-  <!-- start gazebo with an empty plane -->
-  <param name="/use_sim_time" value="true" />
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
 
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find uos_gazebo_worlds)/worlds/avz_collada.world" respawn="false" output="screen"/>
+  <!-- set use_sim_time flag -->
+  <group if="$(arg use_sim_time)">
+    <param name="/use_sim_time" value="true" />
+  </group>
+
+
+  <!-- start uos avz world -->
+  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find uos_gazebo_worlds)/worlds/avz_collada.world" respawn="false" output="screen" />
+
+  <!-- start gui -->
+  <group if="$(arg gui)">
+    <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
+  </group>
 
 </launch>
