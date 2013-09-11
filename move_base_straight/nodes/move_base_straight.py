@@ -25,8 +25,12 @@ class MoveBaseStraightAction(object):
         self.MAX_SPEED = rospy.get_param('~max_speed', 0.2) # [m/s]
         self.MIN_SPEED = rospy.get_param('~min_speed', 0.05) # [m/s]
 
-        # Tolerance for goal approach
-        self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.1) # [m]
+        # Tolerance for goal approach (we stop when distance is below this)
+        self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.02) # [m]
+
+        # Tolerance for movement success (action returns aborted if
+        # distance to goal is still above this after we stopped)
+        self.MAX_SUCCESS_RANGE = rospy.get_param('~max_success_range', 0.2) # [m]
 
         # Minimal safety radius around base footprint
         self.RANGE_MINIMUM = rospy.get_param('~range_minimum', 0.5) # [m]
@@ -89,7 +93,6 @@ class MoveBaseStraightAction(object):
 
     def laser_cb(self, scan):
         self.scan = scan
-        # print min(scan.ranges)
 
     def manual_cb(self, target_pose):
         goal = MoveBaseGoal(target_pose=target_pose)
@@ -97,7 +100,7 @@ class MoveBaseStraightAction(object):
 
     def execute_cb(self, goal):
         if not self.scan:
-            rospy.logwarn('No messaged received yet on topic %s, aborting goal!' % rospy.resolve_name('base_scan'))
+            rospy.logwarn('No messages received yet on topic %s, aborting goal!' % rospy.resolve_name('base_scan'))
             self.action_server.set_aborted()
             return
 
@@ -169,8 +172,13 @@ class MoveBaseStraightAction(object):
             if blocked:
                 # send command to stop
                 self.cmd_vel_pub.publish(Twist())
-                rospy.logwarn('%s: Blocked! Reason: Distance %s at angle %s (%s angle difference to goal direction)' % (self.action_name, block_reason[0], block_reason[1], block_reason[2]))
-                self.action_server.set_aborted()
+                rospy.logwarn('%s: Blocked! Distance to goal: %s m. Critical object distance of %s m at angle %s (%s angle difference to goal direction)' % (self.action_name, dist, block_reason[0], block_reason[1], block_reason[2]))
+                if(dist <= self.MAX_SUCCESS_RANGE):
+                    rospy.logwarn('%s: Succeeded' % self.action_name)
+                    self.action_server.set_succeeded()
+                else:
+                    rospy.logwarn('%s: Aborted' % self.action_name)
+                    self.action_server.set_aborted()
                 break
 
             # Can we see enough?
