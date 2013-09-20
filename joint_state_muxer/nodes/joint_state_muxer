@@ -17,24 +17,23 @@ def get_param(name, value=None):
 
 class JointStateMuxer():
     def __init__(self):
-        description = get_param('robot_description')
-        robot = URDF().parse_xml_string(description)
+        robot = URDF().from_parameter_server()
         self.free_joints = {}
         self.joint_list = [] # for maintaining the original order of the joints
         self.dependent_joints = get_param("dependent_joints", {})
 
         # Find all non-fixed joints
-        for (jname, joint) in robot.joints.items():
+        for joint in robot.joints:
             jtype = joint.joint_type
             if jtype == 'fixed':
                 continue
             name = joint.name
-            if jtype == 'continuous' or joint.limits is None:
+            if jtype == 'continuous' or joint.limit is None:
                 minval = -pi
                 maxval = pi
             else:
-                minval = joint.limits.lower
-                maxval = joint.limits.upper
+                minval = joint.limit.lower
+                maxval = joint.limit.upper
 
             if joint.mimic is not None:
                 entry = {'parent': joint.mimic.joint_name }
