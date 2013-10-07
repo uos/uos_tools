@@ -11,6 +11,7 @@
         <updateRate>${update_rate}</updateRate>
         <bodyName>${link}</bodyName>
         <topicName>${imu_topic}</topicName>
+        <serviceName>/default_imu</serviceName>
         <gaussianNoise>${stdev*stdev}</gaussianNoise>
         <xyzOffsets>0 0 0</xyzOffsets> 
         <rpyOffsets>0 0 0</rpyOffsets>
