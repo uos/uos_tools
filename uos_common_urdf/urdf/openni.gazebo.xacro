@@ -5,7 +5,7 @@
    * Publishes MONO8 format "depth" image & PointCloud
    * Publishes RGB8 format color image & 2nd copy of PointCloud (for registered)
 
-  Sensor parameters are from PR2 description.  
+  Sensor parameters are from PR2 description.
 -->
 <robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
@@ -37,7 +37,7 @@
           <imageTopicName>/${camera_name}/depth/image_raw</imageTopicName>
           <cameraInfoTopicName>/${camera_name}/depth/camera_info</cameraInfoTopicName>
           <depthImageTopicName>/${camera_name}/depth/image_raw</depthImageTopicName>
-          <depthImageInfoTopicName>/${camera_name}/depth/camera_info</depthImageInfoTopicName>
+          <depthImageCameraInfoTopicName>/${camera_name}/depth/camera_info</depthImageCameraInfoTopicName>
           <pointCloudTopicName>/${camera_name}/depth/points</pointCloudTopicName>
           <frameName>${frame_name}</frameName>
           <pointCloudCutoff>0.5</pointCloudCutoff>
@@ -75,6 +75,8 @@
           <cameraName>${camera_name}_rgb</cameraName>
           <imageTopicName>/${camera_name}/rgb/image_raw</imageTopicName>
           <cameraInfoTopicName>/${camera_name}/rgb/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/${camera_name}/depth/image_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>/${camera_name}/depth/camera_info</depthImageCameraInfoTopicName>
           <pointCloudTopicName>/${camera_name}/depth_registered/points</pointCloudTopicName>
           <frameName>${frame_name}</frameName>
           <pointCloudCutoff>0.5</pointCloudCutoff>
