@@ -6,8 +6,8 @@
   xmlns:xacro="http://ros.org/wiki/xacro"
   name="${camera}">
 
-  <include filename="$(find uos_common_urdf)/common.xacro" />
-  <include filename="$(find uos_common_urdf)/urdf/openni.gazebo.xacro" />
+  <xacro:include filename="$(find uos_common_urdf)/common.xacro" />
+  <xacro:include filename="$(find uos_common_urdf)/urdf/openni.gazebo.xacro" />
 
   <xacro:macro name="kinect" params="camera">
 

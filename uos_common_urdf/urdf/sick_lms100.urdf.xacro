@@ -5,7 +5,7 @@
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
   >
 
-  <include filename="$(find uos_common_urdf)/common.xacro" />
+  <xacro:include filename="$(find uos_common_urdf)/common.xacro" />
 
   <xacro:property name="laser_x" value="0.105" />
   <xacro:property name="laser_y" value="0.102" />
