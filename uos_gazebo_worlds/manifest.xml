@@ -15,10 +15,10 @@
   <platform os="ubuntu" version="10.10"/>
   <platform os="ubuntu" version="11.04"/>
 
-  <depend package="gazebo" />
+  <depend package="gazebo_ros" />
 
   <export>
-    <gazebo gazebo_media_path="${prefix}" />
+    <gazebo_ros gazebo_media_path="${prefix}" />
   </export>
 
 </package>
