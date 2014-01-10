@@ -15,8 +15,6 @@ from geometry_msgs.msg import PoseStamped, Twist
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal, MoveBaseResult
 from sensor_msgs.msg import LaserScan
 
-# move_base_straight version for non-holonomic robots - some form of rotation included
-
 class MoveBaseStraightAction(object):
 
     FREQ = 10
@@ -24,7 +22,7 @@ class MoveBaseStraightAction(object):
     def __init__(self, name):
         # Get parameters -------------------------------------------------------
         # Max and min speeds
-        self.MAX_SPEED = rospy.get_param('~max_speed', 0.1) # [m/s]
+        self.MAX_SPEED = rospy.get_param('~max_speed', 0.2) # [m/s]
         self.MIN_SPEED = rospy.get_param('~min_speed', 0.05) # [m/s]
         self.ANGULAR_SPEED = rospy.get_param('~angular_speed', 0.6)
 
@@ -47,21 +45,20 @@ class MoveBaseStraightAction(object):
         # Is the robot holonomic?
         self.HOLONOMIC = rospy.get_param('~holonomic', False)
 
-        self.footprint_frame = rospy.get_param('~footprint_frame', '/base_footprint')
-
         # We can also listen for PoseStamped targets on some topic.
-        self.GOAL_TOPIC_NAME = rospy.get_param('goal_topic_name', None)
-
-        # -------------------------------------------------------------------------
-
-        # Subscribe to laser scan
-        rospy.Subscriber('/base_scan', LaserScan, self.laser_cb)
-
-        # The topic we publish our velocity commands on
-        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)
+        self.GOAL_TOPIC_NAME = rospy.get_param('~goal_topic_name', None)
+        # ----------------------------------------------------------------------
 
         self.action_name = name
         self.tf_listener = tf.TransformListener()
+        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)
+
+        # Subscribe to base_scan
+        self.scan = None
+        rospy.Subscriber("/base_scan", LaserScan, self.laser_cb)
+
+        self.footprint_frame = rospy.get_param('~footprint_frame', '/base_footprint')
+        self.laser_frame = None   # will be initialized dynamically
 
         # Set up action server
         self.action_server = actionlib.SimpleActionServer(self.action_name, MoveBaseAction, execute_cb=self.execute_cb, auto_start=False)
@@ -149,12 +146,11 @@ class MoveBaseStraightAction(object):
         # Get base laser to base footprint frame offset
         while not rospy.is_shutdown():
             try:
-                self.tf_listener.waitForTransform(self.footprint_frame, self.laser_frame, rospy.Time(), rospy.Duration(3.0))
+                self.tf_listener.waitForTransform(self.footprint_frame, self.laser_frame, rospy.Time(), rospy.Duration(1.0))
                 self.LASER_BASE_OFFSET = self.tf_listener.lookupTransform(self.footprint_frame, self.laser_frame, rospy.Time())[0][0]
-                print self.LASER_BASE_OFFSET
                 break
             except (tf.Exception) as e:
-                rospy.logwarn("MoveBaseBlind tf exception! Message!")
+                rospy.logwarn("MoveBaseBlind tf exception! Message: %s" % e.message)
                 rospy.sleep(0.1)
                 continue
 
@@ -176,13 +172,14 @@ class MoveBaseStraightAction(object):
 
                     self.tf_listener.waitForTransform('/base_footprint',
                             target_pose.header.frame_id,
-                            rospy.Time.now(), rospy.Duration(4.0))
+                            target_pose.header.stamp, rospy.Duration(1.0))
                     target_pose_transformed = self.tf_listener.transformPose('/base_footprint', target_pose)
                     break
                 except (tf.Exception) as e:
                     rospy.logwarn("MoveBaseBlind tf exception! Message: %s" % e.message)
                     rospy.sleep(0.1)
                     continue
+
             # check that preempt has not been requested by the client
             if self.action_server.is_preempt_requested():
                 rospy.loginfo('%s: Preempted' % self.action_name)
