@@ -31,7 +31,7 @@ class MoveBaseStraightAction(object):
         # Tolerance for goal approach
         self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.1) # [m]
         self.YAW_GOAL_TOLERANCE = rospy.get_param('~yaw_goal_tolerance', 0.2) # [rad]
-        
+
         # Minimal safety radius around base footprint
         self.RANGE_MINIMUM = rospy.get_param('~range_minimum', 0.5) # [m]
 
@@ -46,23 +46,23 @@ class MoveBaseStraightAction(object):
 
         # Is the robot holonomic?
         self.HOLONOMIC = rospy.get_param('~holonomic', False)
-        
+
         self.footprint_frame = rospy.get_param('~footprint_frame', '/base_footprint')
 
         # We can also listen for PoseStamped targets on some topic.
         self.GOAL_TOPIC_NAME = rospy.get_param('goal_topic_name', None)
-        
+
         # -------------------------------------------------------------------------
-        
+
         # Subscribe to laser scan
         rospy.Subscriber('/base_scan', LaserScan, self.laser_cb)
- 
+
         # The topic we publish our velocity commands on
-        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)       
-       
+        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)
+
         self.action_name = name
         self.tf_listener = tf.TransformListener()
-        
+
         # Set up action server
         self.action_server = actionlib.SimpleActionServer(self.action_name, MoveBaseAction, execute_cb=self.execute_cb, auto_start=False)
         self.action_server.start()
@@ -73,7 +73,7 @@ class MoveBaseStraightAction(object):
             self.client.wait_for_server()
             rospy.Subscriber(self.GOAL_TOPIC_NAME, PoseStamped, self.manual_cb)
             rospy.loginfo('%s: Manual control topic is: %s' % (self.action_name, self.GOAL_TOPIC_NAME))
-            
+
     def laser_to_base(self, distance_laser, angle_laser):
         """
         Uses the laws of sines and cosines to transform range/angle pairs in the
@@ -107,31 +107,31 @@ class MoveBaseStraightAction(object):
             # send command to stop
             rospy.logwarn('%s: Blocked! Reason: Distance %s at angle %s (%s angle difference to goal direction)' % (self.action_name, block_reason[0], block_reason[1], block_reason[2]))
             return True
-        else: 
+        else:
             return False
-     
+
     def translate_towards_goal_holonomically(self, cmd):
         drive_speed = max(self.MAX_SPEED * self.speed_multiplier, self.MIN_SPEED)
         cmd = Twist()
         cmd.linear.x = (self.x_diff / self.dist) * drive_speed
         cmd.linear.y = (self.y_diff / self.dist) * drive_speed
         self.cmd_vel_pub.publish(cmd)
-       
+
 
     def translate_towards_goal(self, cmd):
         # Drive towards goal!
         cmd.linear.x = self.MAX_SPEED
         cmd.angular.z = self.target_angle * self.ANGULAR_SPEED
         self.cmd_vel_pub.publish(cmd)
-        
+
     def rotate_in_place(self, cmd, direction):
         # Rotate towards goal orientation
         if (direction > 0):
             cmd.angular.z = 0.2
         else:
-            cmd.angular.z = -0.2	                
+            cmd.angular.z = -0.2
         self.cmd_vel_pub.publish(cmd)
-        
+
     def laser_cb(self, scan):
         self.scan = scan
         self.laser_frame = scan.header.frame_id
@@ -139,13 +139,13 @@ class MoveBaseStraightAction(object):
     def manual_cb(self, target_pose):
         goal = MoveBaseGoal(target_pose=target_pose)
         self.client.send_goal(goal)
-        
+
     def execute_cb(self, goal):
         if not self.scan:
             rospy.logwarn('No messages received yet on topic %s, aborting goal!' % rospy.resolve_name('base_scan'))
             self.action_server.set_aborted()
             return
-        
+
         # Get base laser to base footprint frame offset
         while not rospy.is_shutdown():
             try:
@@ -160,7 +160,7 @@ class MoveBaseStraightAction(object):
 
         # helper variables
         target_pose = goal.target_pose
-        
+
         # publish info to the console
         rospy.loginfo('%s: Executing, moving to position: (%f, %f)' % (self.action_name, target_pose.pose.position.x, target_pose.pose.position.y))
 
@@ -193,8 +193,8 @@ class MoveBaseStraightAction(object):
             self.y_diff = target_pose_transformed.pose.position.y
             self.dist = np.sqrt(self.x_diff ** 2 + self.y_diff ** 2)
 
-            euler = tf.transformations.euler_from_quaternion([target_pose_transformed.pose.orientation.x, 
-                    target_pose_transformed.pose.orientation.y, target_pose_transformed.pose.orientation.z, 
+            euler = tf.transformations.euler_from_quaternion([target_pose_transformed.pose.orientation.x,
+                    target_pose_transformed.pose.orientation.y, target_pose_transformed.pose.orientation.z,
                     target_pose_transformed.pose.orientation.w])
 
             self.target_angle = np.arctan2(target_pose_transformed.pose.position.y, target_pose_transformed.pose.position.x)
@@ -208,7 +208,7 @@ class MoveBaseStraightAction(object):
             # Check if path is blocked. If so, abort.
             if self.blocked():
                 self.action_server.set_aborted()
-                rospy.loginfo('%s: Aborted.' % self.action_name)                  
+                rospy.loginfo('%s: Aborted.' % self.action_name)
                 break
 
             cmd = Twist()
@@ -216,23 +216,22 @@ class MoveBaseStraightAction(object):
             # Translate holonomically
             if (self.HOLONOMIC and self.dist > self.GOAL_THRESHOLD):
                 self.translate_towards_goal_holonomically(cmd)
-            
+
             # Translate non-holonomically
-            elif (self.dist > self.GOAL_THRESHOLD):   
+            elif (self.dist > self.GOAL_THRESHOLD):
                 self.translate_towards_goal(cmd)
-            
+
             # If goal distance falls below xy-tolerance, rotate:
             elif (abs(euler[2]) > self.YAW_GOAL_TOLERANCE):
                 self.rotate_in_place(cmd, euler[2])
-            
+
             # Arrived
             else:
-                rospy.loginfo('%s: Succeeded' % self.action_name)                  
-		self.action_server.set_succeeded()
-		break
+                rospy.loginfo('%s: Succeeded' % self.action_name)
+                self.action_server.set_succeeded()
+                break
 
 if __name__ == '__main__':
     rospy.init_node('move_base_straight')
     MoveBaseStraightAction(rospy.get_name())
     rospy.spin()
-
