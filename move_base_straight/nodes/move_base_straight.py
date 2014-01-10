@@ -81,16 +81,16 @@ class MoveBaseStraightAction(object):
         angle_base = np.arcsin(distance_laser * np.sin(gamma) / distance_base)
         return (distance_base, angle_base)
 
-    def blocked(self):
+    def blocked(self, target_angle, dist):
         # Something in the way?
         blocked = False
         block_reason = None
         # used to reduce speed for goal/obstacle approach
-        self.speed_multiplier = min(1.0, (self.dist - self.GOAL_THRESHOLD) / self.SLOWDOWN_RANGE)
+        self.speed_multiplier = min(1.0, (dist - self.GOAL_THRESHOLD) / self.SLOWDOWN_RANGE)
         laser_angle = self.scan.angle_min
         for laser_distance in self.scan.ranges:
             (base_distance, base_angle) = self.laser_to_base(laser_distance, laser_angle)
-            angle_diff = abs(base_angle - self.target_angle)
+            angle_diff = abs(base_angle - target_angle)
             will_get_closer = angle_diff < (np.pi / 2.0)
             is_too_close = (base_distance < self.RANGE_MINIMUM) and (laser_distance > self.scan.range_min)
             if will_get_closer:
@@ -107,22 +107,24 @@ class MoveBaseStraightAction(object):
         else:
             return False
 
-    def translate_towards_goal_holonomically(self, cmd):
+    def translate_towards_goal_holonomically(self, x_diff, y_diff, dist):
         drive_speed = max(self.MAX_SPEED * self.speed_multiplier, self.MIN_SPEED)
         cmd = Twist()
-        cmd.linear.x = (self.x_diff / self.dist) * drive_speed
-        cmd.linear.y = (self.y_diff / self.dist) * drive_speed
+        cmd.linear.x = (x_diff / dist) * drive_speed
+        cmd.linear.y = (y_diff / dist) * drive_speed
         self.cmd_vel_pub.publish(cmd)
 
 
-    def translate_towards_goal(self, cmd):
-        # Drive towards goal!
+    def translate_towards_goal(self, target_angle):
+        # Drive towards goal
+        cmd = Twist()
         cmd.linear.x = self.MAX_SPEED
-        cmd.angular.z = self.target_angle * self.ANGULAR_SPEED
+        cmd.angular.z = target_angle * self.ANGULAR_SPEED
         self.cmd_vel_pub.publish(cmd)
 
-    def rotate_in_place(self, cmd, direction):
+    def rotate_in_place(self, direction):
         # Rotate towards goal orientation
+        cmd = Twist()
         if (direction > 0):
             cmd.angular.z = 0.2
         else:
@@ -186,41 +188,40 @@ class MoveBaseStraightAction(object):
                 self.action_server.set_preempted()
                 break
 
-            self.x_diff = target_pose_transformed.pose.position.x
-            self.y_diff = target_pose_transformed.pose.position.y
-            self.dist = np.sqrt(self.x_diff ** 2 + self.y_diff ** 2)
+            x_diff = target_pose_transformed.pose.position.x
+            y_diff = target_pose_transformed.pose.position.y
+            dist = np.sqrt(x_diff ** 2 + y_diff ** 2)
 
             euler = tf.transformations.euler_from_quaternion([target_pose_transformed.pose.orientation.x,
                     target_pose_transformed.pose.orientation.y, target_pose_transformed.pose.orientation.z,
                     target_pose_transformed.pose.orientation.w])
 
-            self.target_angle = np.arctan2(target_pose_transformed.pose.position.y, target_pose_transformed.pose.position.x)
+            target_angle = np.arctan2(target_pose_transformed.pose.position.y, target_pose_transformed.pose.position.x)
             # target_angle is 0 in the center of the laser scan
             # Can we see enough?
-            if ((self.target_angle - self.REQUIRED_APERTURE/2) < self.scan.angle_min or
-                (self.target_angle + self.REQUIRED_APERTURE/2) > self.scan.angle_max):
+            if ((target_angle - self.REQUIRED_APERTURE/2) < self.scan.angle_min or
+                (target_angle + self.REQUIRED_APERTURE/2) > self.scan.angle_max):
                 # Driving blind (maybe activate warning signals here)
                 pass
 
             # Check if path is blocked. If so, abort.
-            if self.blocked():
+            if self.blocked(target_angle, dist):
                 self.action_server.set_aborted()
                 rospy.loginfo('%s: Aborted.' % self.action_name)
                 break
 
-            cmd = Twist()
             # Goal not yet reached?
             # Translate holonomically
-            if (self.HOLONOMIC and self.dist > self.GOAL_THRESHOLD):
-                self.translate_towards_goal_holonomically(cmd)
+            if (self.HOLONOMIC and dist > self.GOAL_THRESHOLD):
+                self.translate_towards_goal_holonomically(x_diff, y_diff, dist)
 
             # Translate non-holonomically
-            elif (self.dist > self.GOAL_THRESHOLD):
-                self.translate_towards_goal(cmd)
+            elif (dist > self.GOAL_THRESHOLD):
+                self.translate_towards_goal(target_angle)
 
             # If goal distance falls below xy-tolerance, rotate:
             elif (abs(euler[2]) > self.YAW_GOAL_TOLERANCE):
-                self.rotate_in_place(cmd, euler[2])
+                self.rotate_in_place(euler[2])
 
             # Arrived
             else:
