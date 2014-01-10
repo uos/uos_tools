@@ -210,7 +210,7 @@ class MoveBaseStraightAction(object):
                 # send command to stop
                 self.cmd_vel_pub.publish(Twist())
                 if(dist <= self.GOAL_THRESHOLD_ACCEPTABLE):
-                    rospy.logwarn('%s: Succeeded' % self.action_name)
+                    rospy.loginfo('%s: Succeeded (blocked, but closer to goal than acceptable goal threshold)' % self.action_name)
                     self.action_server.set_succeeded()
                 else:
                     rospy.logwarn('%s: Aborted' % self.action_name)
@@ -232,12 +232,14 @@ class MoveBaseStraightAction(object):
             elif (dist > self.GOAL_THRESHOLD):
                 self.translate_towards_goal(target_angle)
 
-            # If goal distance falls below xy-tolerance, rotate:
+            # If arrived, but yaw error too large, stop and rotate
             elif (abs(euler[2]) > self.YAW_GOAL_TOLERANCE):
                 self.rotate_in_place(euler[2])
 
             # Arrived
             else:
+                # send command to stop
+                self.cmd_vel_pub.publish(Twist())
                 rospy.loginfo('%s: Succeeded' % self.action_name)
                 self.action_server.set_succeeded()
                 break
