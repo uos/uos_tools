@@ -26,8 +26,13 @@ class MoveBaseStraightAction(object):
         self.MIN_SPEED = rospy.get_param('~min_speed', 0.05) # [m/s]
         self.ANGULAR_SPEED = rospy.get_param('~angular_speed', 0.6)
 
-        # Tolerance for goal approach
-        self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.1) # [m]
+        # Tolerance for goal approach (we stop when distance is below this)
+        self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.02) # [m]
+
+        # Tolerance for movement success (action returns aborted if
+        # distance to goal is still above this after we stopped)
+        self.GOAL_THRESHOLD_ACCEPTABLE = rospy.get_param('~goal_threshold_acceptable', 0.2) # [m]
+
         self.YAW_GOAL_TOLERANCE = rospy.get_param('~yaw_goal_tolerance', 0.2) # [rad]
 
         # Minimal safety radius around base footprint
@@ -52,6 +57,8 @@ class MoveBaseStraightAction(object):
         self.action_name = name
         self.tf_listener = tf.TransformListener()
         self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)
+
+        self.speed_multiplier = 1.0
 
         # Subscribe to base_scan
         self.scan = None
@@ -101,11 +108,9 @@ class MoveBaseStraightAction(object):
                 break
             laser_angle += self.scan.angle_increment
         if blocked:
-            # send command to stop
             rospy.logwarn('%s: Blocked! Reason: Distance %s at angle %s (%s angle difference to goal direction)' % (self.action_name, block_reason[0], block_reason[1], block_reason[2]))
-            return True
-        else:
-            return False
+        return blocked
+
 
     def translate_towards_goal_holonomically(self, x_diff, y_diff, dist):
         drive_speed = max(self.MAX_SPEED * self.speed_multiplier, self.MIN_SPEED)
@@ -196,19 +201,27 @@ class MoveBaseStraightAction(object):
                     target_pose_transformed.pose.orientation.y, target_pose_transformed.pose.orientation.z,
                     target_pose_transformed.pose.orientation.w])
 
-            target_angle = np.arctan2(target_pose_transformed.pose.position.y, target_pose_transformed.pose.position.x)
+            target_angle = np.arctan2(target_pose_transformed.pose.position.y,
+                                      target_pose_transformed.pose.position.x)
             # target_angle is 0 in the center of the laser scan
+
+            # Check if path is blocked. If so, abort.
+            if self.blocked(target_angle, dist):
+                # send command to stop
+                self.cmd_vel_pub.publish(Twist())
+                if(dist <= self.GOAL_THRESHOLD_ACCEPTABLE):
+                    rospy.logwarn('%s: Succeeded' % self.action_name)
+                    self.action_server.set_succeeded()
+                else:
+                    rospy.logwarn('%s: Aborted' % self.action_name)
+                    self.action_server.set_aborted()
+                break
+
             # Can we see enough?
             if ((target_angle - self.REQUIRED_APERTURE/2) < self.scan.angle_min or
                 (target_angle + self.REQUIRED_APERTURE/2) > self.scan.angle_max):
                 # Driving blind (maybe activate warning signals here)
                 pass
-
-            # Check if path is blocked. If so, abort.
-            if self.blocked(target_angle, dist):
-                self.action_server.set_aborted()
-                rospy.loginfo('%s: Aborted.' % self.action_name)
-                break
 
             # Goal not yet reached?
             # Translate holonomically
