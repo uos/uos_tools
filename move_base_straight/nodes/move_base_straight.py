@@ -24,7 +24,10 @@ class MoveBaseStraightAction(object):
         # Max and min speeds
         self.MAX_SPEED = rospy.get_param('~max_speed', 0.2) # [m/s]
         self.MIN_SPEED = rospy.get_param('~min_speed', 0.05) # [m/s]
-        self.ANGULAR_SPEED = rospy.get_param('~angular_speed', 0.6)
+
+        # multiplier for turning ratio; e.g., 0.6 = rotate at 60% of the speed
+        # required to fully turn towards the goal in 1 second
+        self.ANGULAR_SPEED_GAIN = rospy.get_param('~angular_speed', 0.6)
 
         # Tolerance for goal approach (we stop when distance is below this)
         self.GOAL_THRESHOLD = rospy.get_param('~goal_threshold', 0.02) # [m]
@@ -123,8 +126,8 @@ class MoveBaseStraightAction(object):
     def translate_towards_goal(self, target_angle):
         # Drive towards goal
         cmd = Twist()
-        cmd.linear.x = self.MAX_SPEED
-        cmd.angular.z = target_angle * self.ANGULAR_SPEED
+        cmd.linear.x = max(self.MAX_SPEED * self.speed_multiplier, self.MIN_SPEED)
+        cmd.angular.z = target_angle * self.ANGULAR_SPEED_GAIN
         self.cmd_vel_pub.publish(cmd)
 
     def rotate_in_place(self, direction):
