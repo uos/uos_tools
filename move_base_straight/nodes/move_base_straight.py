@@ -12,7 +12,7 @@ import numpy as np
 import tf
 import actionlib
 from geometry_msgs.msg import PoseStamped, Twist
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal, MoveBaseResult
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import LaserScan
 
 class MoveBaseStraightAction(object):
@@ -62,10 +62,10 @@ class MoveBaseStraightAction(object):
 
         # Subscribe to base_scan
         self.scan = None
+        self.laser_base_offset = None    # will be initialized from first scan message
         rospy.Subscriber("/base_scan", LaserScan, self.laser_cb)
 
         self.footprint_frame = rospy.get_param('~footprint_frame', '/base_footprint')
-        self.laser_frame = None   # will be initialized dynamically
 
         # Set up action server
         self.action_server = actionlib.SimpleActionServer(self.action_name, MoveBaseAction, execute_cb=self.execute_cb, auto_start=False)
@@ -84,7 +84,7 @@ class MoveBaseStraightAction(object):
         base laser frame to range/angle pairs relative to the base footprint frame.
         """
         gamma = np.pi - angle_laser
-        distance_base = np.sqrt(self.LASER_BASE_OFFSET**2 + distance_laser**2 - 2 * self.LASER_BASE_OFFSET * distance_laser * np.cos(gamma))
+        distance_base = np.sqrt(self.laser_base_offset**2 + distance_laser**2 - 2 * self.laser_base_offset * distance_laser * np.cos(gamma))
         angle_base = np.arcsin(distance_laser * np.sin(gamma) / distance_base)
         return (distance_base, angle_base)
 
@@ -137,29 +137,31 @@ class MoveBaseStraightAction(object):
         self.cmd_vel_pub.publish(cmd)
 
     def laser_cb(self, scan):
+        if not self.laser_base_offset:
+            # Get laser to base_footprint frame offset
+            laser_frame = scan.header.frame_id
+            while not rospy.is_shutdown():
+                try:
+                    self.tf_listener.waitForTransform(self.footprint_frame, laser_frame, rospy.Time(), rospy.Duration(1.0))
+                    self.laser_base_offset = self.tf_listener.lookupTransform(self.footprint_frame, laser_frame, rospy.Time())[0][0]
+                    break
+                except (tf.Exception) as e:
+                    rospy.logwarn("MoveBaseBlind tf exception! Message: %s" % e.message)
+                    rospy.sleep(0.1)
+                    continue
+
         self.scan = scan
-        self.laser_frame = scan.header.frame_id
+
 
     def manual_cb(self, target_pose):
         goal = MoveBaseGoal(target_pose=target_pose)
         self.client.send_goal(goal)
 
     def execute_cb(self, goal):
-        if not self.scan:
+        if not self.scan or not self.laser_base_offset:
             rospy.logwarn('No messages received yet on topic %s, aborting goal!' % rospy.resolve_name('base_scan'))
             self.action_server.set_aborted()
             return
-
-        # Get base laser to base footprint frame offset
-        while not rospy.is_shutdown():
-            try:
-                self.tf_listener.waitForTransform(self.footprint_frame, self.laser_frame, rospy.Time(), rospy.Duration(1.0))
-                self.LASER_BASE_OFFSET = self.tf_listener.lookupTransform(self.footprint_frame, self.laser_frame, rospy.Time())[0][0]
-                break
-            except (tf.Exception) as e:
-                rospy.logwarn("MoveBaseBlind tf exception! Message: %s" % e.message)
-                rospy.sleep(0.1)
-                continue
 
         # helper variables
         target_pose = goal.target_pose
