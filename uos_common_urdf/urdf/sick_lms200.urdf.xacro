@@ -4,7 +4,7 @@
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="sick_lms200" params="laser_link">
+  <xacro:macro name="sick_lms200" params="laser_link gazebo_topic">
     <link name="${laser_link}">
       <visual>
         <geometry>
@@ -32,14 +32,13 @@
     <gazebo reference="${laser_link}">
       <material value="Gazebo/Blue" />
 
-      <sensor type="ray" name="laser">
+      <sensor type="ray" name="${laser_link}">
         <always_on>true</always_on>
         <visualize>false</visualize>
-        <topic>scan</topic>
         <update_rate>75.0</update_rate>
         <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_laser.so">
-          <frameName>laser</frameName>
-          <topicName>scan</topicName>
+          <frameName>${laser_link}</frameName>
+          <topicName>${gazebo_topic}</topicName>
           <gaussianNoise>0.005</gaussianNoise>
           <updateRate>75.0</updateRate>
         </plugin>
