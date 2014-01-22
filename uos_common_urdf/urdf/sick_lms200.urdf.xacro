@@ -51,8 +51,8 @@
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>true</alwaysOn>
           <updateRate>75.0</updateRate>
-          <topicName>${laser_link}</topicName>
-          <frameName>${gazebo_topic}</frameName>
+          <topicName>${gazebo_topic}</topicName>
+          <frameName>${laser_link}</frameName>
           <interface:laser name="gazebo_ros_laser_iface" />
         </controller:gazebo_ros_laser>
       </sensor:ray>
