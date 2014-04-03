@@ -165,7 +165,7 @@ void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "kurt_freespace");
+  ros::init(argc, argv, "uos_freespace");
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns("~");

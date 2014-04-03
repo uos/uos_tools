@@ -16,4 +16,4 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_executable(kurt_freespace src/kurt-freespace.cc)
+rosbuild_add_executable(uos_freespace src/uos-freespace.cc)

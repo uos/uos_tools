@@ -18,7 +18,7 @@
   <author>Jochen Sprickerhof</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/kurt_freespace</url>
+  <url>http://ros.org/wiki/uos_freespace</url>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
 
