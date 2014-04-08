@@ -27,6 +27,7 @@ def odom_cb(msg):
 def listener():
     rospy.init_node('acc_finder', anonymous=True)
     rospy.Subscriber('odom', Odometry, odom_cb)
+    rospy.loginfo('min_max_finde node ready and listening. now use teleop to move your robot to the limits!')
     rospy.spin()
 
 if __name__ == '__main__':
