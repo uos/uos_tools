@@ -6,7 +6,7 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 
 LIN_MAX = 0.75
-ANG_MAX = 3.0
+ANG_MAX = 1.0   # adjust this value to the rough maximum angular velocity
 
 state = 'stopped'
 start = rospy.Time(0.0)
