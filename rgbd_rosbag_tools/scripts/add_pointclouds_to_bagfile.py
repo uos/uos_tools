@@ -3,8 +3,8 @@
 #
 # Original code taken from the RGB-D benchmark: http://vision.in.tum.de/data/datasets/rgbd-dataset/tools
 #
-# Original author: Jürgen Sturm
-# modified by:     Martin Günther
+# Original author: Juergen Sturm
+# modified by:     Martin Guenther
 
 import argparse
 import sys

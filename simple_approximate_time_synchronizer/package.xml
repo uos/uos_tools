@@ -1,0 +1,29 @@
+<package>
+  <name>simple_approximate_time_synchronizer</name>
+  <version>1.0.0</version>
+  <description>simple_approximate_time_synchronizer</description>
+  <maintainer email="me@v4hn.de">Michael Goerner</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/simple_approximate_time_synchronizer</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Michael Goerner</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>rospy</build_depend>
+  <build_depend>message_filters</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>rospy</run_depend>
+  <run_depend>message_filters</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>rospy</test_depend> -->
+  <!-- <test_depend>message_filters</test_depend> -->
+
+</package>
