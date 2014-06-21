@@ -5,12 +5,14 @@ project(uos_freespace)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs)
 
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+
+catkin_package(
+    CATKIN_DEPENDS roscpp sensor_msgs
+)
+
 
 add_executable(uos_freespace src/uos-freespace.cc)
 
 target_link_libraries(uos_freespace ${catkin_LIBRARIES})
 
-catkin_package(
-    DEPENDS roscpp sensor_msgs
-)

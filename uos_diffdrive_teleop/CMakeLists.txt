@@ -7,6 +7,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs geometry_msgs)
 
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
+catkin_package(
+    CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs
+)
+
 add_executable(uos_diffdrive_teleop_cyborgevo src/uos_diffdrive_teleop_cyborgevo.cpp)
 add_executable(uos_diffdrive_teleop_ps3joy src/uos_diffdrive_teleop_ps3joy.cpp)
 add_executable(uos_diffdrive_teleop_key src/uos_diffdrive_teleop_key.cpp)
@@ -18,6 +22,4 @@ target_link_libraries(uos_diffdrive_teleop_key ${catkin_LIBRARIES})
 target_link_libraries(uos_diffdrive_teleop_wiimote ${catkin_LIBRARIES})
 
 
-catkin_package(
-    CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs
-)
+

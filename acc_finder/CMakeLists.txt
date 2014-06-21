@@ -5,8 +5,8 @@ project(acc_finder)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS rospy geometry_msgs nav_msgs)
 
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 catkin_package(
-    DEPENDS rospy geometry_msgs nav_msgs
+    CATKIN_DEPENDS rospy geometry_msgs nav_msgs
 )
