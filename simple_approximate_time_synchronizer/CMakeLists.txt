@@ -5,8 +5,6 @@ project(simple_approximate_time_synchronizer)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS rospy message_filters)
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_python_setup()
 
 catkin_package(

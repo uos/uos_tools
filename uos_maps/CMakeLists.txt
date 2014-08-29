@@ -5,8 +5,6 @@ project(uos_maps)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED )
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package()
 
 install(DIRECTORY

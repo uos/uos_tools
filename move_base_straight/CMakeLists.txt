@@ -6,8 +6,6 @@ project(move_base_straight)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS actionlib rospy tf std_msgs actionlib_msgs move_base_msgs)
 
-include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS actionlib rospy tf std_msgs actionlib_msgs move_base_msgs
 )

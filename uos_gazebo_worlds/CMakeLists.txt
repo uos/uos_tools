@@ -5,8 +5,6 @@ project(uos_gazebo_worlds)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS gazebo_ros)
 
-include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS gazebo_ros
 )

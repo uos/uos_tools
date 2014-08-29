@@ -5,8 +5,6 @@ project(joint_state_muxer)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS urdfdom_py)
 
-include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS urdfdom_py
 )

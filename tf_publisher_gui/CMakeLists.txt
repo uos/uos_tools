@@ -5,8 +5,6 @@ project(tf_publisher_gui)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS rospy tf)
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS rospy tf
 )

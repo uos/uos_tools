@@ -5,8 +5,6 @@ project(uos_common_urdf)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS urdf xacro gazebo_plugins)
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS urdf xacro gazebo_plugins
 )
