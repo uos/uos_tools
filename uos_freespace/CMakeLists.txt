@@ -15,6 +15,7 @@ catkin_package(
 add_executable(uos_freespace src/uos-freespace.cc)
 
 target_link_libraries(uos_freespace ${catkin_LIBRARIES})
+add_dependencies(uos_freespace ${catkin_EXPORTED_TARGETS})
 
 install(TARGETS
     uos_freespace
