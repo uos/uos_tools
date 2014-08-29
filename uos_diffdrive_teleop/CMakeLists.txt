@@ -22,4 +22,15 @@ target_link_libraries(uos_diffdrive_teleop_key ${catkin_LIBRARIES})
 target_link_libraries(uos_diffdrive_teleop_wiimote ${catkin_LIBRARIES})
 
 
+install(TARGETS
+    uos_diffdrive_teleop_cyborgevo
+    uos_diffdrive_teleop_ps3joy
+    uos_diffdrive_teleop_key
+    uos_diffdrive_teleop_wiimote
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
+install(DIRECTORY
+    launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

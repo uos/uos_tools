@@ -11,3 +11,13 @@ include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 catkin_package(
     CATKIN_DEPENDS actionlib rospy tf std_msgs actionlib_msgs move_base_msgs
 )
+
+install(PROGRAMS
+    nodes/move_base_straight.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY
+    launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

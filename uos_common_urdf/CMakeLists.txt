@@ -10,3 +10,18 @@ include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 catkin_package(
     CATKIN_DEPENDS urdf xacro gazebo_plugins
 )
+
+install(FILES
+    common.xacro
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY
+    meshes/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/meshes
+)
+
+install(DIRECTORY
+    urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
+)

@@ -10,3 +10,13 @@ include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 catkin_package(
     CATKIN_DEPENDS rospy tf
 )
+
+install(PROGRAMS
+    tf_publisher_gui
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY
+    launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

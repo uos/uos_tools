@@ -10,3 +10,8 @@ include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 catkin_package(
     CATKIN_DEPENDS urdfdom_py
 )
+
+install(PROGRAMS
+    nodes/joint_state_muxer
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

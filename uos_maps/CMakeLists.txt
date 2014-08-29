@@ -8,3 +8,8 @@ find_package(catkin REQUIRED )
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 catkin_package()
+
+install(DIRECTORY
+    maps/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/maps
+)

@@ -16,3 +16,7 @@ add_executable(uos_freespace src/uos-freespace.cc)
 
 target_link_libraries(uos_freespace ${catkin_LIBRARIES})
 
+install(TARGETS
+    uos_freespace
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
