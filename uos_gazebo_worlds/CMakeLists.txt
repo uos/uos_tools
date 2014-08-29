@@ -3,11 +3,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(uos_gazebo_worlds)
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS gazebo_ros)
+find_package(catkin REQUIRED)
 
-catkin_package(
-    CATKIN_DEPENDS gazebo_ros
-)
+catkin_package()
 
 install(DIRECTORY
     launch/
