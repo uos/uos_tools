@@ -12,14 +12,30 @@ catkin_package(
 )
 
 add_executable(uos_diffdrive_teleop_cyborgevo src/uos_diffdrive_teleop_cyborgevo.cpp)
-add_executable(uos_diffdrive_teleop_ps3joy src/uos_diffdrive_teleop_ps3joy.cpp)
-add_executable(uos_diffdrive_teleop_key src/uos_diffdrive_teleop_key.cpp)
-add_executable(uos_diffdrive_teleop_wiimote src/uos_diffdrive_teleop_wiimote.cpp)
-
 target_link_libraries(uos_diffdrive_teleop_cyborgevo ${catkin_LIBRARIES})
+add_dependencies(uos_diffdrive_teleop_cyborgevo ${catkin_EXPORTED_TARGETS})
+
+add_executable(uos_diffdrive_teleop_ps3joy src/uos_diffdrive_teleop_ps3joy.cpp)
 target_link_libraries(uos_diffdrive_teleop_ps3joy ${catkin_LIBRARIES})
+add_dependencies(uos_diffdrive_teleop_ps3joy ${catkin_EXPORTED_TARGETS})
+
+add_executable(uos_diffdrive_teleop_key src/uos_diffdrive_teleop_key.cpp)
 target_link_libraries(uos_diffdrive_teleop_key ${catkin_LIBRARIES})
+add_dependencies(uos_diffdrive_teleop_key ${catkin_EXPORTED_TARGETS})
+
+add_executable(uos_diffdrive_teleop_wiimote src/uos_diffdrive_teleop_wiimote.cpp)
 target_link_libraries(uos_diffdrive_teleop_wiimote ${catkin_LIBRARIES})
+add_dependencies(uos_diffdrive_teleop_wiimote ${catkin_EXPORTED_TARGETS})
 
+install(TARGETS
+    uos_diffdrive_teleop_cyborgevo
+    uos_diffdrive_teleop_ps3joy
+    uos_diffdrive_teleop_key
+    uos_diffdrive_teleop_wiimote
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-
+install(DIRECTORY
+    launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

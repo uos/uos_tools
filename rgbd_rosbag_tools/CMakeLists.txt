@@ -5,8 +5,11 @@ project(rgbd_rosbag_tools)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS rospy rosbag sensor_msgs cv_bridge)
 
-include_directories( ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-
 catkin_package(
     CATKIN_DEPENDS rospy rosbag sensor_msgs cv_bridge
+)
+
+install(PROGRAMS
+    scripts/add_pointclouds_to_bagfile.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
