@@ -124,6 +124,8 @@ void TeleopPR2Keyboard::keyboardLoop()
   // Setting a new line, then end of file
   raw.c_cc[VEOL] = 1;
   raw.c_cc[VEOF] = 2;
+  raw.c_cc[VMIN] = 0;
+  raw.c_cc[VTIME] = 5;
   tcsetattr(kfd, TCSANOW, &raw);
 
   puts("Reading from keyboard");
@@ -136,6 +138,8 @@ void TeleopPR2Keyboard::keyboardLoop()
 
   while(ros::ok())
   {
+    c = 0;
+
     // get the next event from the keyboard
     if(read(kfd, &c, 1) < 0)
     {
@@ -210,7 +214,10 @@ void TeleopPR2Keyboard::keyboardLoop()
     if (dirty == true)
     {
       vel_pub_.publish(cmd);
-      dirty = false;
+      if(c == 0)
+      {
+        dirty = false;
+      }
     }
     if (requested) {
       req_pub_.publish(request);
