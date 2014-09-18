@@ -134,7 +134,7 @@ void TeleopPR2Keyboard::keyboardLoop()
   puts("Press 'Space' to request a scan");
 
 
-  for(;;)
+  while(ros::ok())
   {
     // get the next event from the keyboard
     if(read(kfd, &c, 1) < 0)
@@ -216,6 +216,7 @@ void TeleopPR2Keyboard::keyboardLoop()
       req_pub_.publish(request);
       requested = false;
     }
+    ros::spinOnce();
 
   }
 }
