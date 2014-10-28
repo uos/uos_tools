@@ -59,7 +59,7 @@ class MoveBaseStraightAction(object):
 
         self.action_name = name
         self.tf_listener = tf.TransformListener()
-        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist)
+        self.cmd_vel_pub = rospy.Publisher('base_controller/command', Twist, queue_size=1)
 
         self.speed_multiplier = 1.0
 
