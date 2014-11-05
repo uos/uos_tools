@@ -99,10 +99,12 @@ class MoveBaseStraightAction(object):
         self.speed_multiplier = min(1.0, (dist - self.GOAL_THRESHOLD) / self.SLOWDOWN_RANGE)
         laser_angle = self.scan.angle_min
         for laser_distance in self.scan.ranges:
+            if not (self.scan.range_min <= laser_distance and laser_distance <= self.scan.range_max):
+                continue
             (base_distance, base_angle) = self.laser_to_base(laser_distance, laser_angle)
             angle_diff = abs(base_angle - target_angle)
             will_get_closer = angle_diff < (np.pi / 2.0)
-            is_too_close = (base_distance < self.RANGE_MINIMUM) and (laser_distance > self.scan.range_min)
+            is_too_close = (base_distance < self.RANGE_MINIMUM)
             if will_get_closer:
                 self.speed_multiplier = min(self.speed_multiplier, (base_distance - self.RANGE_MINIMUM) / self.SLOWDOWN_RANGE)
             if is_too_close and will_get_closer:
