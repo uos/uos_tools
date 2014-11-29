@@ -14,7 +14,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>imu_filter_madgwick</run_depend>
   <run_depend>acc_finder</run_depend>
   <run_depend>joint_state_muxer</run_depend>
   <run_depend>move_base_straight</run_depend>
