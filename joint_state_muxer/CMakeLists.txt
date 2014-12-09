@@ -3,10 +3,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(joint_state_muxer)
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS urdfdom_py)
+find_package(catkin REQUIRED COMPONENTS)
 
 catkin_package(
-    CATKIN_DEPENDS urdfdom_py
+    CATKIN_DEPENDS
 )
 
 install(PROGRAMS

@@ -4,10 +4,10 @@ cmake_minimum_required(VERSION 2.8.3)
 project(move_base_straight)
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS actionlib rospy tf std_msgs actionlib_msgs move_base_msgs)
+find_package(catkin REQUIRED COMPONENTS)
 
 catkin_package(
-    CATKIN_DEPENDS actionlib rospy tf std_msgs actionlib_msgs move_base_msgs
+    CATKIN_DEPENDS
 )
 
 install(PROGRAMS
