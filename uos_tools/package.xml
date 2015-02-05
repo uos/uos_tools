@@ -15,6 +15,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>acc_finder</run_depend>
+  <run_depend>battery_guard</run_depend>
   <run_depend>joint_state_muxer</run_depend>
   <run_depend>move_base_straight</run_depend>
   <run_depend>rgbd_rosbag_tools</run_depend>
