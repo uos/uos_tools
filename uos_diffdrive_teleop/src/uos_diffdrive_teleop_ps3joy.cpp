@@ -1,57 +1,77 @@
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
-#include <sensor_msgs/Joy.h>
+/*
+ *
+ * Copyright (C) 2015 University of Osnabrück, Germany
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * uos_diffdrive_teleop_ps3.cpp
+ *
+ *  Created on: 16.02.2015
+ *      Author: Sebastian Pütz <spuetz@uos.de>
+ */
 
-double max_vel_x, max_rotational_vel;
-ros::Publisher vel_pub;
-double speed_multiplier;
+#include <uos_diffdrive_teleop_ps3joy.h>
 
-void ps3joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
-{
-  geometry_msgs::Twist vel;
-  if (joy->buttons[8] == 1)   // check for full-speed button
-  {
-    speed_multiplier = 1.0;
-  }
-  else if (true)  // check if right analog stick was used to scale speed
-  {
-    speed_multiplier = 0.5 + (0.5 * joy->axes[3]);  // stick full front -> speed_multiplier = 1.0 , full back -> 0.0
-  }
-  else  // else use half max speed
-  {
-    speed_multiplier = 0.5;
-  }
+TeleopPS3::TeleopPS3(){
+  ros::NodeHandle n_private("~");
+  //enable button pressure intensity
+  n_private.param("use_button_pressure", use_button_pressure, false);
+  joy_sub = n_.subscribe<sensor_msgs::Joy>("joy", 15,  &TeleopPS3::PS3Callback, this);
+}
 
-  // check if cross is used for steering
-  if (joy->buttons[4] || joy->buttons[5] || 
-      joy->buttons[6] || joy->buttons[7])
-  {
-    // note that every button of the cross (axes 4-7) generates 
-    // an output in [-1.0, 0.0]
-    vel.linear.x = max_vel_x * (joy->axes[4] * -1.0 + joy->axes[6]) * speed_multiplier;
-    vel.angular.z = max_rotational_vel * (joy->axes[7] * -1.0 + joy->axes[5]) * speed_multiplier;
+void TeleopPS3::PS3Callback(const sensor_msgs::Joy::ConstPtr& joy) {
+
+  // factor elem of [0 1]
+  double factor_x = 0;
+  double factor_y = 0;
+  double fac_button_x = 0;
+  double fac_button_y = 0;
+
+  // read the stick intensity factor
+  double fac_stick_y = joy->axes[PS3_AXIS_STICK_LEFT_UPWARDS];
+  double fac_stick_x = joy->axes[PS3_AXIS_STICK_LEFT_LEFTWARDS];
+
+  // if required, read the button pressure as intensity factor
+  if(use_button_pressure) {
+    // left, normalize scale  
+    double fac_button_up = (1-joy->axes[PS3_AXIS_BUTTON_CROSS_UP])/2.0;
+    double fac_button_down = -(1-joy->axes[PS3_AXIS_BUTTON_CROSS_DOWN])/2.0;
+    fac_button_y = fac_button_up + fac_button_down;
+    // right, normalize scale
+    double fac_button_left = (1-joy->axes[PS3_AXIS_BUTTON_CROSS_LEFT])/2.0;
+    double fac_button_right = -(1-joy->axes[PS3_AXIS_BUTTON_CROSS_RIGHT])/2.0;
+    fac_button_x = fac_button_left + fac_button_right;
+  } else { 
+    // no button pressure required, check if the factor should be 1 or 0
+    // if there is no button pressure enabled the factor should be 1
+    fac_button_y = joy->buttons[PS3_BUTTON_CROSS_UP] - joy->buttons[PS3_BUTTON_CROSS_DOWN];
+    fac_button_x = joy->buttons[PS3_BUTTON_CROSS_LEFT] - joy->buttons[PS3_BUTTON_CROSS_RIGHT]; 
   }
-  else  // use left analog stick
-  {
-    vel.linear.x = max_vel_x * joy->axes[1] * speed_multiplier;
-    vel.angular.z = max_rotational_vel * joy->axes[0] * speed_multiplier;
-  }
-  vel_pub.publish(vel);
+  // enable both, stick and buttons at the same time
+  factor_x = fac_button_x + fac_stick_x; // can be > 1 or < -1
+  factor_y = fac_button_y + fac_stick_y; // can be > 1 or < -1
+
+  in.forwards = factor_y;
+  in.left = factor_x;
+  in.updated = true;
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "uos_diffdrive_teleop_ps3joy");
-
-  ros::NodeHandle nh;
-  ros::NodeHandle nh_ns("~");
-
-  nh_ns.param("max_vel_x", max_vel_x, 1.5);
-  nh_ns.param("max_rotational_vel", max_rotational_vel, 3.0);
-
-  vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-  ros::Subscriber ps3joy_sub = nh.subscribe("joy", 10, ps3joyCallback);
-
+  ros::init(argc, argv, "uos_diffdrive_teleop_ps3");
+  TeleopPS3 teleop;
   ros::spin();
+  return EXIT_SUCCESS;
 }
-

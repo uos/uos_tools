@@ -5,7 +5,7 @@ project(uos_diffdrive_teleop)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs geometry_msgs)
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 catkin_package(
     CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs
@@ -15,11 +15,11 @@ add_executable(uos_diffdrive_teleop_cyborgevo src/uos_diffdrive_teleop_cyborgevo
 target_link_libraries(uos_diffdrive_teleop_cyborgevo ${catkin_LIBRARIES})
 add_dependencies(uos_diffdrive_teleop_cyborgevo ${catkin_EXPORTED_TARGETS})
 
-add_executable(uos_diffdrive_teleop_ps3joy src/uos_diffdrive_teleop_ps3joy.cpp)
+add_executable(uos_diffdrive_teleop_ps3joy src/uos_diffdrive_teleop.cpp src/uos_diffdrive_teleop_ps3joy.cpp)
 target_link_libraries(uos_diffdrive_teleop_ps3joy ${catkin_LIBRARIES})
 add_dependencies(uos_diffdrive_teleop_ps3joy ${catkin_EXPORTED_TARGETS})
 
-add_executable(uos_diffdrive_teleop_key src/uos_diffdrive_teleop_key.cpp)
+add_executable(uos_diffdrive_teleop_key src/uos_diffdrive_teleop.cpp src/uos_diffdrive_teleop_key.cpp)
 target_link_libraries(uos_diffdrive_teleop_key ${catkin_LIBRARIES})
 add_dependencies(uos_diffdrive_teleop_key ${catkin_EXPORTED_TARGETS})
 
