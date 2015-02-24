@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
-<robot
-  xmlns:xacro="http://ros.org/wiki/xacro">
-  
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  >
+
   <xacro:include filename="$(find uos_common_urdf)/common.xacro" />
 
   <xacro:property name="laser_x" value="0.156" />
@@ -9,15 +12,55 @@
   <xacro:property name="laser_z" value="0.185" />
   <xacro:property name="laser_mass" value="2.0" />
 
-  <link name="laser">
-    <visual>
-	    <geometry>
-        <box size="${laser_x} ${laser_y} ${laser_z}" />
-	    </geometry>
-    	<material name="blue" >
-      		<color rgba="0 0 1 1" />
-    	</material>
-    </visual>
-    <xacro:box_inertial x="${laser_x}" y="${laser_y}" z="${laser_z}" mass="${laser_mass}" />
-  </link>
+  <xacro:macro name="sick_s300" params="laser_link gazebo_topic">
+    <link name="${laser_link}">
+      <visual>
+        <geometry>
+          <mesh filename="package://uos_common_urdf/meshes/sick_lms-100.stl" />
+          <!-- <box size="${laser_x} ${laser_y} ${laser_z}" /> -->
+        </geometry>
+        <material name="yellow" >
+          <color rgba="0 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://uos_common_urdf/meshes/sick_lms-100.stl" />
+          <!-- <box size="${laser_x} ${laser_y} ${laser_z}" /> -->
+        </geometry>
+      </collision>
+      <xacro:box_inertial x="${laser_x}" y="${laser_y}" z="${laser_z}" mass="${laser_mass}" />
+    </link>
+
+    <gazebo reference="${laser_link}">
+      <material value="Gazebo/Yellow" />
+
+      <sensor type="ray" name="${laser_link}">
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <update_rate>25.0</update_rate>
+        <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_laser.so">
+          <frameName>${laser_link}</frameName>
+          <topicName>${gazebo_topic}</topicName>
+          <gaussianNoise>0.0042</gaussianNoise>
+          <updateRate>25.0</updateRate>
+        </plugin>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>270</samples>
+              <resolution>1</resolution>
+              <min_angle>-2.356</min_angle>
+              <max_angle>2.356</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.10</min>
+            <max>20.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+      </sensor>
+    </gazebo>
+</xacro:macro>
 </robot>
