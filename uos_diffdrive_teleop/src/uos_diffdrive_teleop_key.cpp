@@ -1,122 +1,39 @@
 /*
- * based on teleop_pr2_keyboard
- * Copyright (c) 2008, Willow Garage, Inc.
- * All rights reserved.
+ *
+ * Copyright (C) 2015 University of Osnabrück, Germany
  * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <ORGANIZATION> nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * uos_diffdrive_teleop_key.cpp
+ *
+ *  Created on: 16.02.2015
+ *      Author: Sebastian Pütz <spuetz@uos.de>
  */
 
-// Author: Kevin Watts
-
-#include <termios.h>
-#include <signal.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
-#include <std_msgs/String.h>
-
-#define KEYCODE_A 0x61
-#define KEYCODE_D 0x64
-#define KEYCODE_S 0x73
-#define KEYCODE_W 0x77 
-#define KEYCODE_Q 0x71
-#define KEYCODE_E 0x65
-
-#define KEYCODE_A_CAP 0x41
-#define KEYCODE_D_CAP 0x44
-#define KEYCODE_S_CAP 0x53
-#define KEYCODE_W_CAP 0x57
-#define KEYCODE_Q_CAP 0x51
-#define KEYCODE_E_CAP 0x45
-
-#define KEYCODE_SPACE 0x20
-
-class TeleopPR2Keyboard
-{
-  private:
-  double walk_vel, run_vel, yaw_rate, yaw_rate_run;
-  geometry_msgs::Twist cmd;
-  std_msgs::String request;
-
-  ros::NodeHandle n_;
-  ros::Publisher vel_pub_;
-  ros::Publisher req_pub_;
-
-  public:
-  void init()
-  { 
-    cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
-
-    vel_pub_ = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    req_pub_ = n_.advertise<std_msgs::String>("request", 1);
-
-    ros::NodeHandle n_private("~");
-    n_private.param("walk_vel", walk_vel, 0.5);
-    n_private.param("run_vel", run_vel, 1.0);
-    n_private.param("yaw_rate", yaw_rate, 1.0);
-    n_private.param("yaw_run_rate", yaw_rate_run, 1.5);
-
-  }
-  
-  ~TeleopPR2Keyboard()   { }
-  void keyboardLoop();
-
-};
+#include <uos_diffdrive_teleop_key.h>
 
 int kfd = 0;
 struct termios cooked, raw;
 
-void quit(int sig)
-{
-  tcsetattr(kfd, TCSANOW, &cooked);
-  exit(0);
-}
-
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "uos_diffdrive_teleop_key");
-
-  TeleopPR2Keyboard tpk;
-  tpk.init();
-
-  signal(SIGINT,quit);
-
-  tpk.keyboardLoop();
-
-  return(0);
-}
-
-void TeleopPR2Keyboard::keyboardLoop()
-{
-  char c;
-  bool dirty=false;
-  bool requested=false;
-
+TeleopKeyboard::TeleopKeyboard(){
+  ros::NodeHandle n_private("~");
+  n_private.param("normal_x", normal_x, 0.5);
+  n_private.param("normal_y", normal_y, 0.5);
+  n_private.param("high_x", normal_x, 1.0);
+  n_private.param("high_y", normal_y, 1.0);
+  
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
   memcpy(&raw, &cooked, sizeof(struct termios));
@@ -130,100 +47,102 @@ void TeleopPR2Keyboard::keyboardLoop()
 
   puts("Reading from keyboard");
   puts("---------------------------");
-  puts("Use 'WASD' to translate");
-  puts("Use 'QE' to yaw");
+  puts("Use 'WS' to translate");
+  puts("Use 'AD' to yaw");
+  puts("Use 'QE' to translate and yaw");
   puts("Press 'Shift' to run");
-  puts("Press 'Space' to request a scan");
+}
 
-
-  while(ros::ok())
+void TeleopKeyboard::readKeyboard()
+{
+  c = 0;
+  // get the next event from
+  // the keyboard
+  if(read(kfd, &c, 1) < 0)
   {
-    c = 0;
-
-    // get the next event from the keyboard
-    if(read(kfd, &c, 1) < 0)
-    {
-      perror("read():");
-      exit(-1);
-    }
-
-    cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
-
-    switch(c)
-    {
-      // Walking
-    case KEYCODE_W:
-      cmd.linear.x = walk_vel;
-      dirty = true;
-      break;
-    case KEYCODE_S:
-      cmd.linear.x = - walk_vel;
-      dirty = true;
-      break;
-    case KEYCODE_A:
-      cmd.linear.y = walk_vel;
-      dirty = true;
-      break;
-    case KEYCODE_D:
-      cmd.linear.y = - walk_vel;
-      dirty = true;
-      break;
-    case KEYCODE_Q:
-      cmd.angular.z = yaw_rate;
-      dirty = true;
-      break;
-    case KEYCODE_E:
-      cmd.angular.z = - yaw_rate;
-      dirty = true;
-      break;
-
-      // Running 
-    case KEYCODE_W_CAP:
-      cmd.linear.x = run_vel;
-      dirty = true;
-      break;
-    case KEYCODE_S_CAP:
-      cmd.linear.x = - run_vel;
-      dirty = true;
-      break;
-    case KEYCODE_A_CAP:
-      cmd.linear.y = run_vel;
-      dirty = true;
-      break;
-    case KEYCODE_D_CAP:
-      cmd.linear.y = - run_vel;
-      dirty = true;
-      break;
-    case KEYCODE_Q_CAP:
-      cmd.angular.z = yaw_rate_run;
-      dirty = true;
-      break;
-    case KEYCODE_E_CAP:
-      cmd.angular.z = - yaw_rate_run;
-      dirty = true;
-      break;
-
-      //Requests
-    case KEYCODE_SPACE:
-      request.data = "scanRequest";
-      requested = true;
-      break;
-    }
-
-    
-    if (dirty == true)
-    {
-      vel_pub_.publish(cmd);
-      if(c == 0)
-      {
-        dirty = false;
-      }
-    }
-    if (requested) {
-      req_pub_.publish(request);
-      requested = false;
-    }
-    ros::spinOnce();
-
+    perror("read():");
+    exit(-1);
   }
+
+  in.updated = true;
+  
+  switch(c)
+  {
+    // Walking
+    case
+      KEYCODE_W:
+      in.forwards = normal_y;
+      break;
+    case
+      KEYCODE_S:
+      in.forwards = -normal_y;
+      break;
+    case
+      KEYCODE_A:
+      in.left = normal_x;
+      break;
+    case
+      KEYCODE_D:
+      in.left = -normal_x;
+      break;
+    case
+      KEYCODE_Q:
+      in.forwards = normal_y;
+      in.left = normal_x;
+      break;
+    case
+      KEYCODE_E:
+      in.forwards = normal_y;
+      in.left = -normal_x;
+      break;
+
+    // Running 
+    case
+      KEYCODE_W_CAP:
+      in.forwards = high_y;
+      break;
+    case
+      KEYCODE_S_CAP:
+      in.forwards = -high_y;
+      break;
+    case
+      KEYCODE_A_CAP:
+      in.left = high_x;
+      break;
+    case
+      KEYCODE_D_CAP:
+      in.left = -high_x;
+      break;
+    case
+      KEYCODE_Q_CAP:
+      in.forwards = high_y;
+      in.left = high_x;
+      break;
+    case
+      KEYCODE_E_CAP:
+      in.forwards = high_y;
+      in.left = -high_x;
+      break;
+    default:
+      in.updated = false;
+  }
+}
+
+void quit(int sig)
+{
+  tcsetattr(kfd, TCSANOW, &cooked);
+  exit(0);
+}
+
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "uos_diffdrive_teleop_key");
+  TeleopKeyboard teleop;
+  signal(SIGINT,quit);
+
+  while(ros::ok()){
+    ros::spinOnce();
+    teleop.readKeyboard();
+  }
+  return EXIT_SUCCESS;
 }
