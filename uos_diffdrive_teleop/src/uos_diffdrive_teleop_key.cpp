@@ -31,8 +31,8 @@ TeleopKeyboard::TeleopKeyboard(){
   ros::NodeHandle n_private("~");
   n_private.param("normal_x", normal_x, 0.5);
   n_private.param("normal_y", normal_y, 0.5);
-  n_private.param("high_x", normal_x, 1.0);
-  n_private.param("high_y", normal_y, 1.0);
+  n_private.param("high_x", high_x, 1.0);
+  n_private.param("high_y", high_y, 1.0);
   
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
