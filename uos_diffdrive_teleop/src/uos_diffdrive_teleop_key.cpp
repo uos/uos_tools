@@ -139,9 +139,10 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "uos_diffdrive_teleop_key");
   TeleopKeyboard teleop;
   signal(SIGINT,quit);
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
 
   while(ros::ok()){
-    ros::spinOnce();
     teleop.readKeyboard();
   }
   return EXIT_SUCCESS;
