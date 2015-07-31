@@ -7,10 +7,21 @@
 #define INVPIDIV180          57.29578               /*   180 / pi   */
 #define EPSILON              0.000001               // vergleich von 2 doubles
 #define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
+//set laserscan_pos to -1 if the scaner is upside down, if not set to 1
+#define LASERSCAN_POS  -1 //laser scanner upside down
+//#define LASERSCAN_POS  1
 
 double max_vel_x, max_rotational_vel;
 ros::Publisher vel_pub;
+//state_turn needs to be global or otherwise the state will allwayes set to 0 when autonomous_behave() gets called 
+int state_turn = 0;
+//turn_omega is used to determine the maximum angular velocity? Should it be global?
+double turn_omega = 0.0;
 
+
+//find the maximum distance infront of the robot. The orientation weight is used to determine if its infront and far away
 double calc_freespace(const sensor_msgs::LaserScan::ConstPtr &laser)
 {
   unsigned int i;
@@ -29,31 +40,18 @@ double calc_freespace(const sensor_msgs::LaserScan::ConstPtr &laser)
     // phi = (double)i / (laser->ranges.size() - 1) * M_PI - M_PI/2.0;
     phi = laser->angle_min + i * laser->angle_increment;
 
-    //printf("%d %f \n", i, phi);
-    // cos(phi/2) gewichtet die werte nach vorne maximal und am
-    // rand entsprechend weniger (hier 0)
-    // exp term fuer grosse distance ungefaehr 0 d.h. keine einfluss
-
-    orientation_weight = cos(phi/1.2) * 1.0/(1.0+exp(-(laser->ranges[i]-3.0)/0.3));
-    // kann aber nicht oben berechnet werden wegen scalierung von obigen wert
-    // printf("%d %lf %f %f\n",i,laser->ranges[i], INVPIDIV180 * phi, orientation_weight);
+    //the arg of cos should not be smaler then phi/2 otherwise the robot will get instable when there are obstacles close to the side of the robot
+    //rang-arg determines where the max change of the exp function is
+    // /0.5 change the width of the exp function. Smaller value means bigger change.
+    orientation_weight = cos(phi/2) * 1.0/(1.0+exp(-(laser->ranges[i]-1)/0.5));
     sinsum += sin(phi) * orientation_weight;
     cossum += cos(phi) * orientation_weight;
   }
   // printf("*****************\n");
+  // dont know whats happening here, why do we check if cossum is bigger then Epsilon?
+  if (fabs(cossum) > EPSILON) alpha = atan2(sinsum, cossum);
 
-  if (fabs(sinsum) > EPSILON) alpha = atan2(sinsum, cossum);
-
-  // printf("a %f \n",INVPIDIV180 * alpha);
-  // hier noch checken ob was null wird
-  // if (fabs(Back_sinsum) > EPSILON) alpha += atan2(Back_sinsum,Back_cossum);
-  /*
-  printf("alpha %f sinsum %f cossum %f \n",
-      INVPIDIV180 * alpha,
-      sinsum,
-      cossum);
-  */
-  return alpha;
+  return LASERSCAN_POS*alpha;
 }
 
 int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
@@ -64,98 +62,120 @@ int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
   double general_distance = 65536.0;
   *distance_to_obstacle = 65536.0;
   *index_to_obstacle = -1;
-  //for (i = 0; i < laser->ranges.size(); i++) {
-  for (i = 10; i < (laser->ranges.size() - 10); i++) {
-    // new wegen der aufhaengung muss ein minimal wert ueberschritten sein
-    // cout<<"sickscanner check range laser->ranges.size(): "<<laser->ranges.size()<<" distance "<<*distance<<" x["<<i<<"] "<<x[i]<<" y["<<i<<"] "<<y[i] <<" xregion "<<xregion<<" yregion "<<yregion<<endl;
-    double x = laser->ranges[i] * sin(laser->angle_min + i * laser->angle_increment);
-    double y = laser->ranges[i] * cos(laser->angle_min + i * laser->angle_increment);
-    if (laser->ranges[i] > 0.1) { // damit wir auch nicht nur uns sehen
-      if ((fabs(x) < xregion) && (y < yregion)) { // hier muessen wir uns etwas merken
-        if (*distance_to_obstacle > y) {
-          *distance_to_obstacle = y;
-          *index_to_obstacle = i;
-        }
-      }
-      if ((fabs(x) < xregion)) { // hier muessen wir uns etwas merken
-        if (general_distance > y) {
-          general_distance = y;
-        }
-      }
-    }
-  }
+  double removeAngle = 45;
+  double iAngle = (((removeAngle)*(3.14/180))/laser->angle_increment);
+  int limit = int(floor(iAngle));
+
+  //The laser scanner detects part of the robot frame.
+  //ignore data from min angle to min angle plus limit and from max_angle minus limit
+  for (i = fabs(limit); i < (laser->ranges.size() - fabs(limit)); i++) {
+		double x = laser->ranges[i] * cos(laser->angle_min + i * laser->angle_increment);
+		double y = laser->ranges[i] * sin(laser->angle_min + i * laser->angle_increment);
+		if (laser->ranges[i] > 0.1) { // if the range is smaller then a specific amount ignore it. Does this still make sense?
+		  if ((x < xregion) && (fabs(y) < (yregion / 2))) { // Is there something in a specific area infront of the robot?
+			if (*distance_to_obstacle > x) {
+			  *distance_to_obstacle = x;	//Found obstacle, set distance to it
+			  *index_to_obstacle = i;
+			}
+		  }
+		  if ((fabs(y) < (yregion / 2))) { //Is there something in general infront of the robot?
+			if (general_distance > x) {
+			  general_distance = x;		   //Set general distance to the closest object infront of the robot
+			}
+		  }
+		}
+	}
+
   if (*index_to_obstacle == -1) *distance_to_obstacle = general_distance;
   return 0;
 }
-
+//Statemachine
+//Drive into the general direction of the freespace infront of the Robot
+//If there is an obstacle infront of the robot turn away from it
+//X axis is pointing out of the front of the robot in direction
+//Y axis is pointing out of the axis of the right front wheel
+//Z axis is pointing to the roof
 void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
 {
-
-  int state_turn = 0;
-  double XRegion = 0.25; //25.0
-  double ZRegion = 0.56; // 56.0
-  double DTOStopTurning = 0.60; //60.0
-  double DTOStartTurning = 0.50; //50.0
+  //Here the region for the obstacle avoidance is defined
+  //       ^
+  //       |
+  //    [XRegion]   
+  //       |
+  // | <-YRegion-> |
+  //       | 
+  //    ___+___      +laserscanner
+  //   | Robot |
+  double XRegion = 0.5; //[m] defines the region in x direction infront of the robot
+  double YRegion = 0.5; //[m] defines the region in y direction infront of the robot
+  double DTOStopTurning = 1; //[m] defines when to start to turn into freespace
+  double DTOStartTurning = 0.5; //[m] defines when to start to turn away form an obstacle
   int index_to_obstacle = -1;
-  double Front_Max_Distance = -1; //maximaler laserstrahl
-  double turn_omega = 0.0;
-  double u_turning = 0.2 * max_vel_x;
+  double Front_Max_Distance = 0;
+  
+  double u_turning = 0.2 * max_vel_x;    //decrease the speed while turning
   double distance_to_obstacle = INFINITY;
-  double omega = calc_freespace(laser);
-  double u = max_vel_x;
+  double omega = calc_freespace(laser); //find the freespace infront of the robot and return the angle to the direction of the freespace
+  double u = max_vel_x;                 //define maximum velocity of the robot
+  
   for(unsigned int i = 0; i < laser->ranges.size(); i++) {
     if(laser->ranges[i] > Front_Max_Distance) {
       Front_Max_Distance = laser->ranges[i];
     }
   }
-  //cout<<" autonomous behave omega: "<<omega<<" max_vel_x "<<max_vel_x<<endl;
-  // check if obstacle in front (xregion: width, yregion: length)
-  // virtual roadway
+  //look for obstacles infront of the robot
   SICK_Check_range(laser,
       XRegion,
-      ZRegion,
+      YRegion,
       &index_to_obstacle,
       &distance_to_obstacle);
 
   // slow down if obstacle
   if (index_to_obstacle != -1) {
-    //cout<<" autonomous obstacle"<<endl;
-    u = distance_to_obstacle / ZRegion * max_vel_x;
+    u = distance_to_obstacle / (XRegion * max_vel_x);
   }
 
   // handle turning mode
+  //turn if obstacle is infront
   if (state_turn == 1) {
-    //cout<<" autonomous state turn"<<endl;
-    if ( (distance_to_obstacle > DTOStopTurning)
-        // && (fabs(omega) < M_PI*10.0/180.0) )
-      ) {
+    if ( (distance_to_obstacle > DTOStopTurning)) {
         state_turn = 0;                 // end turning
-        //status->AntiWindup = 0.0;               // reset pid integration
+        
       } else {
-        omega = turn_omega;             // turn
-        u = min(u, u_turning);
+            if (omega > 0.0) {
+				if (omega < max_rotational_vel)
+					omega = max_rotational_vel - omega;
+				else 
+					omega = M_PI - omega;
+			}
+			else if (omega < 0.0) {
+				if (omega > max_rotational_vel)
+					omega = -max_rotational_vel - omega;
+				else 
+					omega = -M_PI - omega;
+			}
+        //omega = turn_omega;             // turn
+        u = min(u, u_turning);          //set velocity to u if its not higher then the maximum velocity
       }
   }
   // detect end of corridor use StopTurn val
   if (((Front_Max_Distance < DTOStopTurning)
         || (distance_to_obstacle < DTOStartTurning))
       && (state_turn == 0) ) {
-    //cout<<" autonomous end of corridor FMD "<<Front_Max_Distance<<endl;
+ 
     // start turning
     // turn away from obstacle
     if (omega > 0.0) {
-      omega = 0.999 * M_PI;
+      omega = min(omega,max_rotational_vel);
     }
-    if (omega < 0.0) {
-      omega = -0.999 * M_PI;
+    else if (omega < 0.0) {
+      omega = max(omega,-max_rotational_vel);
     }
     state_turn = 1;
-    turn_omega = omega;
+    //turn_omega = omega;
     u = min(u, u_turning);
-    //status->AntiWindup = 0.0;                 // reset pid integration
   }
 
-  //cout << u << " " << omega << " " << state_turn << " " << distance_to_obstacle << endl;
 
   geometry_msgs::Twist vel;
   vel.linear.x = u;
@@ -170,8 +190,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns("~");
 
-  nh_ns.param("max_vel_x", max_vel_x, 0.9);
-  nh_ns.param("max_rotational_vel", max_rotational_vel, 1.0);
+  nh_ns.param("max_vel_x", max_vel_x, 0.3);
+  nh_ns.param("max_rotational_vel", max_rotational_vel, 0.3);
 
   vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   ros::Subscriber laser_sub = nh.subscribe("scan", 10, autonomous_behave);
