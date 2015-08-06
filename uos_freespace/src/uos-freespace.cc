@@ -12,6 +12,7 @@
 //set laserscan_pos to -1 if the scaner is upside down, if not set to 1
 #define LASERSCAN_POS  -1 //laser scanner upside down
 //#define LASERSCAN_POS  1
+#define LASERSCAN_OPENING_ANGLE_WIDTH 270
 
 double max_vel_x, max_rotational_vel;
 ros::Publisher vel_pub;
@@ -63,7 +64,8 @@ int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
   *distance_to_obstacle = 65536.0;
   *index_to_obstacle = -1;
   double removeAngle = 45;
-  double iAngle = (((removeAngle)*(3.14/180))/laser->angle_increment);
+  double maxAngleRad = ((LASERSCAN_OPENING_ANGLE_WIDTH - (2 * removeAngle)) / 360) * 2 * M_PI; 
+  double iAngle = (((removeAngle)*(M_PI/180))/laser->angle_increment);
   int limit = int(floor(iAngle));
 
   //The laser scanner detects part of the robot frame.
@@ -132,7 +134,7 @@ void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
 
   // slow down if obstacle
   if (index_to_obstacle != -1) {
-    u = distance_to_obstacle / (XRegion * max_vel_x);
+    u = max(distance_to_obstacle - 0.2 / (XRegion * max_vel_x),0);
   }
 
   // handle turning mode
@@ -142,21 +144,16 @@ void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
         state_turn = 0;                 // end turning
         
       } else {
-            if (omega > 0.0) {
-				if (omega < max_rotational_vel)
-					omega = max_rotational_vel - omega;
-				else 
-					omega = M_PI - omega;
-			}
-			else if (omega < 0.0) {
-				if (omega > max_rotational_vel)
-					omega = -max_rotational_vel - omega;
-				else 
-					omega = -M_PI - omega;
-			}
+        //turn slower if obstacle is infront
+        if (omega > 0.0) {
+			omega = max(max_rotational_vel, (max_rotational_vel * (1 - (omega / (M_PI / 2)))));
+		}
+		else if (omega < 0.0) {
+			omega = min(-max_rotational_vel, (max_rotational_vel * (-1 - (omega / (M_PI / 2)))));
+		}  
+	  }
         //omega = turn_omega;             // turn
-        u = min(u, u_turning);          //set velocity to u if its not higher then the maximum velocity
-      }
+      u = min(u, u_turning);          //set velocity to u if its not higher then the maximum velocity
   }
   // detect end of corridor use StopTurn val
   if (((Front_Max_Distance < DTOStopTurning)
@@ -166,7 +163,7 @@ void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
     // start turning
     // turn away from obstacle
     if (omega > 0.0) {
-      omega = min(omega,max_rotational_vel);
+      omega = min(omega,max_rotational_vel); //omega should not exceed max_rotational_vel
     }
     else if (omega < 0.0) {
       omega = max(omega,-max_rotational_vel);
