@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/QuaternionStamped.h>
 #include <sensor_msgs/LaserScan.h>
+#include "tf/transform_listener.h"
+#include "tf/transform_broadcaster.h"
+#include "tf/message_filter.h"
 
 #define INVPIDIV180          57.29578               /*   180 / pi   */
 #define EPSILON              0.000001               // vergleich von 2 doubles
@@ -10,7 +14,7 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 
 //set laserscan_pos to -1 if the scaner is upside down, if not set to 1
-#define LASERSCAN_POS  -1 //laser scanner upside down
+//#define LASERSCAN_POS  -1 //laser scanner upside down
 //#define LASERSCAN_POS  1
 #define LASERSCAN_OPENING_ANGLE_WIDTH 270
 
@@ -20,7 +24,9 @@ ros::Publisher vel_pub;
 int state_turn = 0;
 //turn_omega is used to determine the maximum angular velocity? Should it be global?
 double turn_omega = 0.0;
-
+int scannerOrientation = 0; //1 for right side up, -1 for upside-down laserscanner
+std::string base_link = "base_link";
+std::string laser = "laser";
 
 //find the maximum distance infront of the robot. The orientation weight is used to determine if its infront and far away
 double calc_freespace(const sensor_msgs::LaserScan::ConstPtr &laser)
@@ -52,7 +58,42 @@ double calc_freespace(const sensor_msgs::LaserScan::ConstPtr &laser)
   // dont know whats happening here, why do we check if cossum is bigger then Epsilon?
   if (fabs(cossum) > EPSILON) alpha = atan2(sinsum, cossum);
 
-  return LASERSCAN_POS*alpha;
+  return scannerOrientation*alpha;
+}
+
+int IsInvertedScannerCheck(const sensor_msgs::LaserScan::ConstPtr &laserscan){
+  // To account for lasers that are mounted upside-down, we determine the
+  // min, max, and increment angles of the laser in the base frame.
+  static tf::TransformListener tf_;
+  tf::Quaternion q;
+  q.setRPY(0.0, 0.0, laserscan->angle_min);
+  tf::Stamped<tf::Quaternion> min_q(q, laserscan->header.stamp,laserscan->header.frame_id);
+  q.setRPY(0.0, 0.0, laserscan->angle_max);
+  tf::Stamped<tf::Quaternion> max_q(q, laserscan->header.stamp,laserscan->header.frame_id);
+  try
+  {
+	//ros::Time now = ros::Time::now();
+	//tf_.waitForTransform(laser,base_link,now,ros::Duration(3.0));
+	//tf_.waitForTransform(base_link, laser,laserscan->header.stamp,ros::Duration(3.0));
+    tf_.transformQuaternion(base_link, min_q, min_q);
+    tf_.transformQuaternion(base_link, max_q, max_q);
+  }
+  catch(tf::TransformException& e)
+  {
+    ROS_WARN("Unable to transform min/max laser angles into base frame: %s",e.what());
+    return 0; //if there is an error transforming , assume it's right side up
+  }
+  ROS_INFO("Successfully transformed min/max laser angles into base frame");
+  double angle_min = tf::getYaw(min_q);
+  double angle_max = tf::getYaw(max_q);
+  double gsp_laser_angle_increment = (angle_max - angle_min) / laserscan->ranges.size();
+  ROS_DEBUG("Laser angles in base frame: min: %.3f max: %.3f inc: %.3f", angle_min, angle_max, gsp_laser_angle_increment);
+  
+  if (gsp_laser_angle_increment < 0){
+		ROS_DEBUG("Inverting scan");
+		return -1; //upside-down
+	}
+	return 1; //right side up
 }
 
 int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
@@ -67,7 +108,7 @@ int SICK_Check_range(const sensor_msgs::LaserScan::ConstPtr &laser,
   double maxAngleRad = ((LASERSCAN_OPENING_ANGLE_WIDTH - (2 * removeAngle)) / 360) * 2 * M_PI; 
   double iAngle = (((removeAngle)*(M_PI/180))/laser->angle_increment);
   int limit = int(floor(iAngle));
-
+ 
   //The laser scanner detects part of the robot frame.
   //ignore data from min angle to min angle plus limit and from max_angle minus limit
   for (i = fabs(limit); i < (laser->ranges.size() - fabs(limit)); i++) {
@@ -125,6 +166,10 @@ void autonomous_behave(const sensor_msgs::LaserScan::ConstPtr &laser)
       Front_Max_Distance = laser->ranges[i];
     }
   }
+  if(scannerOrientation == 0) {
+	scannerOrientation = IsInvertedScannerCheck(laser);
+  }
+  
   //look for obstacles infront of the robot
   SICK_Check_range(laser,
       XRegion,
