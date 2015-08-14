@@ -13,6 +13,7 @@ class FreeSpace {
 	private:
 		//variables
 			double max_vel_x_, max_rotational_vel_; //max velocity of robot
+			double turn_omega_; //this is used to keep track of the turning angle of the robot when turn_state_ = 1;
 			int turn_state_; 	//if robot gets too close to an object in front, it switches to turn mode
 								//it keeps turning until there is no more obstacle and switches out of turn mode.
 			int scanner_orientation_; //0 for initial, 1 for right side up, -1 for upside-down laserscanner
