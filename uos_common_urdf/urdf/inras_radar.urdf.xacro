@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find uos_common_urdf)/common.xacro" />
+
+  <xacro:property name="radar_width" value="0.18"/>
+  <xacro:property name="radar_height" value="0.14"/>
+  <xacro:property name="radar_length" value="0.052"/>
+  <!-- distance TX1 and front of casing -->
+  <xacro:property name="radar_center_x_pos" value="0.01"/>
+  <!-- distance TX1 and left side of the casing -->
+  <xacro:property name="radar_center_y_pos" value="0.076"/>
+  <!-- distance center of TX1 and bottom of the casing -->
+  <xacro:property name="radar_center_z_pos" value="0.099"/>
+
+  <xacro:macro name="inras_radar" params="radar_link">
+    <link name="${radar_link}">
+      <visual>
+        <origin rpy="0 0 0" xyz="${radar_center_x_pos - radar_length/2} ${radar_width/2 - radar_center_y_pos} ${radar_height/2 - radar_center_z_pos}"/>
+        <geometry>
+          <box size="${radar_length} ${radar_width} ${radar_height}" />
+        </geometry>
+        <material name="grey" >
+          <color rgba="0.5 0.5 0.5 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="${radar_center_x_pos - radar_length/2} ${radar_width/2 - radar_center_y_pos} ${radar_height/2 - radar_center_z_pos}"/>
+        <geometry>
+          <box size="${radar_length} ${radar_width} ${radar_height}" />
+        </geometry>
+      </collision>
+      <xacro:box_inertial x="${radar_length}" y="${radar_width}" z="${radar_height}" mass="0.01"/>
+    </link>
+  </xacro:macro>
+</robot>
