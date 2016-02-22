@@ -34,11 +34,9 @@
           <alwaysOn>true</alwaysOn>
           <updateRate>1.0</updateRate>
           <cameraName>${camera_name}_ir</cameraName>
-          <imageTopicName>/${camera_name}/depth/image_raw</imageTopicName>
-          <cameraInfoTopicName>/${camera_name}/depth/camera_info</cameraInfoTopicName>
-          <depthImageTopicName>/${camera_name}/depth/image_raw</depthImageTopicName>
-          <depthImageCameraInfoTopicName>/${camera_name}/depth/camera_info</depthImageCameraInfoTopicName>
-          <pointCloudTopicName>/${camera_name}/depth/points</pointCloudTopicName>
+          <depthImageTopicName>/${camera_name}/depth_registered/image_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>/${camera_name}/depth_registered/camera_info</depthImageCameraInfoTopicName>
+          <pointCloudTopicName>/${camera_name}/depth_registered/points</pointCloudTopicName>
           <frameName>${frame_name}</frameName>
           <pointCloudCutoff>0.5</pointCloudCutoff>
           <distortionK1>0.00000001</distortionK1>
@@ -75,9 +73,6 @@
           <cameraName>${camera_name}_rgb</cameraName>
           <imageTopicName>/${camera_name}/rgb/image_raw</imageTopicName>
           <cameraInfoTopicName>/${camera_name}/rgb/camera_info</cameraInfoTopicName>
-          <depthImageTopicName>/${camera_name}/depth/image_raw</depthImageTopicName>
-          <depthImageCameraInfoTopicName>/${camera_name}/depth/camera_info</depthImageCameraInfoTopicName>
-          <pointCloudTopicName>/${camera_name}/depth_registered/points</pointCloudTopicName>
           <frameName>${frame_name}</frameName>
           <pointCloudCutoff>0.5</pointCloudCutoff>
           <distortionK1>0.00000001</distortionK1>
