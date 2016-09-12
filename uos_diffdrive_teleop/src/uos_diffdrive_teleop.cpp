@@ -98,7 +98,9 @@ void Teleop::updateVelocity(const ros::TimerEvent &t_event){
   vel_cmd.angular.z = velo.x;
 
   //publish command
-  vel_pub.publish(vel_cmd);
+  if(std::abs(vel_cmd.linear.x) > EPSILON_VELO || std::abs(vel_cmd.angular.z) > EPSILON_VELO) {
+    vel_pub.publish(vel_cmd);
+  }
   // TODO apply velocity by service call
 }
 
