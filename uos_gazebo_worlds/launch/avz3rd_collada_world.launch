@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- start uos avz world (3rd floor) -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find uos_gazebo_worlds)/worlds/avz3rd_collada.world"/>
+  </include>
+
+</launch>

@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+<model name="door">
+<!-- this models a door
+        given a specific pose the model will be:
+        - oriented on y-axis
+        - centered on y and x
+        - staying on the ground
+     so a pose estimate from map should be centered and directed orthogonal to door-plane -->
+  <pose>0 0 1 0 0 0</pose>
+  <static>true</static>
+    <link name="link">
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>1.0</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>1.0</iyy>
+          <iyz>0.0</iyz>
+          <izz>1.0</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.05 1.1 2.0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.05 1.1 2.0</size>
+          </box>
+        </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 0</emissive>
+          </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
