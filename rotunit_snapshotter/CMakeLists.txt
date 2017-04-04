@@ -2,8 +2,20 @@ cmake_minimum_required(VERSION 2.4.6)
 
 project(rotunit_snapshotter)
 
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs laser_assembler)
-link_directories(${catkin_LIBRARY_DIRS})
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS
+  roscpp 
+  sensor_msgs 
+  laser_assembler
+)
+
+# include_directories(include)
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
+#link_directories(${catkin_LIBRARY_DIRS})
 
 catkin_package(
   CATKIN_DEPENDS roscpp sensor_msgs laser_assembler
