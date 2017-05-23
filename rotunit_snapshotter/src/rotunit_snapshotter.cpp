@@ -113,7 +113,7 @@ public:
       // Make the service call
       if (client_.call(srv))
       {
-        ROS_INFO("Published Cloud with %zu points", srv.response.cloud.width * srv.response.cloud.height) ;
+        ROS_INFO("Published Cloud with %u points", srv.response.cloud.width * srv.response.cloud.height) ;
         pub_.publish(srv.response.cloud);
       }
       else
