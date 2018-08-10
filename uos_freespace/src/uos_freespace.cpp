@@ -24,7 +24,10 @@ FreeSpace::FreeSpace():
 	//sets the limits for the speed of the navigation
 	private_nh_.param("max_vel_x_", max_vel_x_, 0.5);
 	private_nh_.param("max_rotational_vel_", max_rotational_vel_, 0.3);
-	
+
+	//set tf_prefix
+	tf_prefix_ = tf::getPrefixParam(private_nh_);
+
 	turn_state_ = 0; 
 					
 	scanner_orientation_ = 0; 
@@ -70,13 +73,16 @@ int FreeSpace::isInvertedScannerCheck(const sensor_msgs::LaserScan::ConstPtr &la
 	tf::Stamped<tf::Quaternion> min_q(q, laserscan->header.stamp,laserscan->header.frame_id);
 	q.setRPY(0.0, 0.0, laserscan->angle_max);
 	tf::Stamped<tf::Quaternion> max_q(q, laserscan->header.stamp,laserscan->header.frame_id);
-	
+
+	std::string base_link_frame = tf::resolve(tf_prefix_, "base_link");
+	std::string laser_frame = tf::resolve(tf_prefix_, "laser");
+
 	try	{
 		//wait for the tf frames to be available then transform the laserscan frame to the base frame
 		//this makes it so all scanners data is read as right-side up
-		tf_.waitForTransform("base_link", "laser",laserscan->header.stamp,ros::Duration(1.0));
-		tf_.transformQuaternion("base_link", min_q, min_q);
-		tf_.transformQuaternion("base_link", max_q, max_q);
+		tf_.waitForTransform(base_link_frame, laser_frame, laserscan->header.stamp, ros::Duration(1.0));
+		tf_.transformQuaternion(base_link_frame, min_q, min_q);
+		tf_.transformQuaternion(base_link_frame, max_q, max_q);
 	}
 	catch(tf::TransformException& e) {
 		//if there is an error transforming, keep the orientation unset to try again
