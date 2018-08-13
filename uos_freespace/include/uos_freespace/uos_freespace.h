@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include "tf/transform_listener.h"
+#include <string>
 
 class FreeSpace {
 	public:
@@ -17,6 +18,7 @@ class FreeSpace {
 			int turn_state_; 	//if robot gets too close to an object in front, it switches to turn mode
 								//it keeps turning until there is no more obstacle and switches out of turn mode.
 			int scanner_orientation_; //0 for initial, 1 for right side up, -1 for upside-down laserscanner
+			std::string tf_prefix_; // optional tf_prefix
 		//node
 			ros::NodeHandle nh_;
 			ros::NodeHandle private_nh_;
