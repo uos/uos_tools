@@ -14,13 +14,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>acc_finder</run_depend>
-  <run_depend>battery_guard</run_depend>
-  <run_depend>joint_state_muxer</run_depend>
-  <run_depend>move_base_straight</run_depend>
-  <run_depend>rgbd_rosbag_tools</run_depend>
-  <run_depend>simple_approximate_time_synchronizer</run_depend>
-  <run_depend>tf_publisher_gui</run_depend>
   <run_depend>uos_common_urdf</run_depend>
   <run_depend>uos_diffdrive_teleop</run_depend>
   <run_depend>uos_freespace</run_depend>
