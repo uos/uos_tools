@@ -1,23 +1,15 @@
 <package>
   <name>uos_maps</name>
   <version>1.0.0</version>
-  <description>Navigation maps for the AVZ building of the University of Osnabrueck.</description>
+  <description>Navigation maps of the Osnabrueck University</description>
   <maintainer email="mguenthe@uni-osnabrueck.de">Martin Guenther</maintainer>
 
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/uos_maps</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author>Martin Guenther</author>
 
-  <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
-
-  <!-- Dependencies needed to compile this package. -->
-
-  <!-- Dependencies needed after this package is compiled. -->
-
-  <!-- Dependencies needed only for running tests. -->
 
 </package>

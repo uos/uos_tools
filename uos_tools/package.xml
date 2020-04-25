@@ -1,12 +1,12 @@
 <package>
   <name> uos_tools </name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
 
   <description>
    Various helper utilities not associated with a particular stack
   </description>
 
-  <maintainer email="mguenthe@uos.de">Martin Günther</maintainer>
+  <maintainer email="spuetz@uos.de">Sebastian Pütz</maintainer>
 
   <license>BSD, GPL</license>
 

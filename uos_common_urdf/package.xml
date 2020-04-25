@@ -8,27 +8,18 @@
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/uos_common_urdf</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author>Jochen Sprickerhof</author>
   <author>Martin Guenther</author>
 
-  <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <!-- Dependencies needed to compile this package. -->
   <build_depend>urdf</build_depend>
   <build_depend>xacro</build_depend>
   <build_depend>gazebo_plugins</build_depend>
 
-  <!-- Dependencies needed after this package is compiled. -->
   <run_depend>urdf</run_depend>
   <run_depend>xacro</run_depend>
   <run_depend>gazebo_plugins</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>urdf</test_depend> -->
-  <!-- <test_depend>xacro</test_depend> -->
-  <!-- <test_depend>gazebo_plugins</test_depend> -->
 
 </package>
