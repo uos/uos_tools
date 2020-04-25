@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <node name="battery_guard" pkg="battery_guard" type="battery_guard.py" output="screen"/>
-</launch>
