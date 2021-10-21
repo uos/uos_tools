@@ -4,7 +4,7 @@
   <description>uos_diffdrive_teleop</description>
   <maintainer email="spuetz@uos.de">Sebastian Pütz</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3</license>
 
   <url type="website">http://ros.org/wiki/uos_diffdrive_teleop</url>
 
@@ -20,6 +20,5 @@
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
-  <run_depend>ps3joy</run_depend>
-
+  <!-- currently no supported within Noetic>  <run_depend>ps3joy</run_depend> <-->
 </package>

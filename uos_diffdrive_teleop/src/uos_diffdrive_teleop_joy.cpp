@@ -16,22 +16,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * uos_diffdrive_teleop_ps3.cpp
+ * uos_diffdrive_teleop_joy.cpp
  *
  *  Created on: 16.02.2015
  *      Author: Sebastian Pütz <spuetz@uos.de>
  */
 
-#include <uos_diffdrive_teleop_ps3joy.h>
+#include <uos_diffdrive_teleop_joy.h>
 
-TeleopPS3::TeleopPS3(){
+TeleopJoy::TeleopJoy(){
   ros::NodeHandle n_private("~");
   //enable button pressure intensity
   n_private.param("use_button_pressure", use_button_pressure, false);
-  joy_sub = n_.subscribe<sensor_msgs::Joy>("joy", 15,  &TeleopPS3::PS3Callback, this);
+  joy_sub = n_.subscribe<sensor_msgs::Joy>("joy", 15, &TeleopJoy::JoyCallback, this);
 }
 
-void TeleopPS3::PS3Callback(const sensor_msgs::Joy::ConstPtr& joy) {
+void TeleopJoy::JoyCallback(const sensor_msgs::Joy::ConstPtr& joy) {
 
   // factor elem of [0 1]
   double factor_x = 0;
@@ -70,8 +70,8 @@ void TeleopPS3::PS3Callback(const sensor_msgs::Joy::ConstPtr& joy) {
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "uos_diffdrive_teleop_ps3");
-  TeleopPS3 teleop;
+  ros::init(argc, argv, "uos_diffdrive_teleop_joy");
+  TeleopJoy teleop;
   ros::spin();
   return EXIT_SUCCESS;
 }
