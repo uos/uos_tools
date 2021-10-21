@@ -1,6 +1,6 @@
 <package>
   <name> uos_tools </name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 
   <description>
    Various helper utilities not associated with a particular stack

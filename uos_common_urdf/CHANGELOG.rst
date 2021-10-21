@@ -2,8 +2,8 @@
 Changelog for package uos_common_urdf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2021-10-21)
+------------------
 * Add missing xacro tag to property
   find . -iname "*.xacro" | xargs sed -i 's#<\([/]\?\)\(if\|unless\|include\|arg\|property\|macro\|insert_block\)#<\1xacro:\2#g'
 * Add missing xacro tags for inertials with origin (`#25 <https://github.com/uos/uos_tools/issues/25>`_)

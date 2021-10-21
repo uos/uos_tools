@@ -1,6 +1,6 @@
 <package>
   <name>uos_common_urdf</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>This package contains URDF descriptions of the UOS robots.</description>
   <maintainer email="jochen@sprickerhof.de">Jochen Sprickerhof</maintainer>
   <maintainer email="mguenthe@uni-osnabrueck.de">Martin Guenther</maintainer>
