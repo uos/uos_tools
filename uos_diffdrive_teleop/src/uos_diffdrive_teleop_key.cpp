@@ -54,9 +54,8 @@ TeleopKeyboard::TeleopKeyboard()
   puts("Press 'Shift' to run");
 }
 
-void TeleopKeyboard::readInputs()
+void TeleopKeyboard::readKeyboard()
 {
-  std::cout << "readInputs" << std::endl;
   c = 0;
   // get the next event from
   // the keyboard
@@ -65,8 +64,6 @@ void TeleopKeyboard::readInputs()
     perror("read():");
     exit(-1);
   }
-
-  std::cout << "bla" << std::endl;
 
   in.updated = true;
   
@@ -132,23 +129,17 @@ void TeleopKeyboard::readInputs()
   }
 }
 
-void quit(int sig)
-{
-  tcsetattr(kfd, TCSANOW, &cooked);
-  exit(0);
-}
+// void quit(int sig)
+// {
+//   tcsetattr(kfd, TCSANOW, &cooked);
+//   exit(0);
+// }
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  std::cout << "HELLO!" << std::endl;
 
-  // TeleopKeyboard teleop;
-  // signal(SIGINT, quit);
-
-  std::cout << "Create node..." << std::endl;
   auto node = std::make_shared<TeleopKeyboard>();
-  std::cout << "Node created!" << std::endl;
 
   rclcpp::ExecutorOptions opts;
   rclcpp::executors::MultiThreadedExecutor executor(opts, 2);
@@ -158,18 +149,12 @@ int main(int argc, char** argv)
     std::bind(&rclcpp::executors::MultiThreadedExecutor::spin,
             &executor));
 
-
-  std::cout << "Spinning!" << std::endl;
-
   while(rclcpp::ok())
   {
-    std::cout << "Get KEY!" << std::endl;
-    node->readInputs();
+    node->readKeyboard();
   }
 
   executor_thread.join();
-
-
 
   rclcpp::shutdown();
 

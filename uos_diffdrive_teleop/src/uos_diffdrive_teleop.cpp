@@ -74,7 +74,7 @@ Teleop::Teleop(std::string node_name)
 void Teleop::updateVelocity()
 {
   // std::cout << "updateVelocity - start" << std::endl;
-  rclcpp::Duration delta = rclcpp::Duration::from_seconds(0.01);
+  // rclcpp::Duration delta = rclcpp::Duration::from_seconds(update_velocity_rate);
   // rclcpp::Duration delta = t_event.current_real - t_event.last_real;
   
   double left = in.left;
@@ -85,8 +85,8 @@ void Teleop::updateVelocity()
   forwards = std::min(1.0, forwards);
   forwards = std::max(-1.0, forwards);
 
-  velo.y = adaptVelocity(delta.seconds(), velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
-  velo.x = adaptVelocity(delta.seconds(), velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
+  velo.y = adaptVelocity(update_velocity_rate, velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
+  velo.x = adaptVelocity(update_velocity_rate, velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
 
   // velocity limits by intensity
   velo.dyn_limit_y = max_vel * forwards;

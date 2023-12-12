@@ -57,8 +57,6 @@ class TeleopKeyboard
     TeleopKeyboard();
     void readKeyboard();
 
-    virtual void readInputs();
-
   private:
     char c;    
     double normal_x;

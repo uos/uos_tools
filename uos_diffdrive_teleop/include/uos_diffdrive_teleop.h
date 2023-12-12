@@ -43,6 +43,7 @@ class Teleop : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr vel_timer;
     rclcpp::TimerBase::SharedPtr key_timer;
   
+    // actually its a duration
     double update_inputs_rate;
     double update_velocity_rate;
 
@@ -50,7 +51,6 @@ class Teleop : public rclcpp::Node
     void updateInputs();
 
     // implement this!
-    virtual void readInputs() = 0;
 
     double max_vel;
     double max_rot_vel;
