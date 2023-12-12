@@ -1,25 +1,20 @@
-<package>
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>uos_common_urdf</name>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>This package contains URDF descriptions of the UOS robots.</description>
-  <maintainer email="jochen@sprickerhof.de">Jochen Sprickerhof</maintainer>
-  <maintainer email="mguenthe@uni-osnabrueck.de">Martin Guenther</maintainer>
-
+  <maintainer email="imitschke@uos.de">Isaak Ihorst</maintainer>
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/uos_common_urdf</url>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <author>Jochen Sprickerhof</author>
-  <author>Martin Guenther</author>
+  <depend>urdf</depend>
+  <depend>xacro</depend>
+  <depend>gazebo_plugins</depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
-
-  <build_depend>urdf</build_depend>
-  <build_depend>xacro</build_depend>
-  <build_depend>gazebo_plugins</build_depend>
-
-  <run_depend>urdf</run_depend>
-  <run_depend>xacro</run_depend>
-  <run_depend>gazebo_plugins</run_depend>
-
+  <export>
+    <build_type>ament_cmake</build_type>
+    <gazebo_ros gazebo_model_path="${prefix}/.." />
+  </export>
 </package>

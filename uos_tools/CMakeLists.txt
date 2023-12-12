@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(uos_tools)
-find_package(catkin REQUIRED)
-catkin_metapackage()
+cmake_minimum_required(VERSION 3.8)
+project(uos_tools NONE)
+find_package(ament_cmake REQUIRED)
+ament_package()

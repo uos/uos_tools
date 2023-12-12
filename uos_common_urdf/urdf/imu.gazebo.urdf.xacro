@@ -5,18 +5,60 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="imu_gazebo" params="link imu_topic update_rate stdev">
-    <gazebo>
-      <plugin name="imu_controller" filename="libgazebo_ros_imu.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>${update_rate}</updateRate>
-        <bodyName>${link}</bodyName>
-        <topicName>${imu_topic}</topicName>
-        <serviceName>/default_imu</serviceName>
-        <gaussianNoise>${stdev*stdev}</gaussianNoise>
-        <xyzOffsets>0 0 0</xyzOffsets> 
-        <rpyOffsets>0 0 0</rpyOffsets>
-        <interface:position name="imu_position"/>
-      </plugin>
+    <gazebo reference="${link}">
+      <sensor name="my_imu" type="imu">
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>${stdev}</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+        <always_on>true</always_on>
+        <update_rate>${update_rate}</update_rate>
+          <plugin name="imu_plugin" filename="libgazebo_ros_imu_sensor.so">
+            <ros>
+            <!-- Will publish to /imu/data -->
+              <remapping>~/out:=${imu_topic}</remapping>
+          </ros>
+          <frame_name>${link}</frame_name>
+        </plugin>
+      </sensor>
     </gazebo>
   </xacro:macro>
 

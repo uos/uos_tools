@@ -1,26 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package>
-  <name> uos_tools </name>
-  <version>1.0.0</version>
+  <name>uos_tools</name>
+  <version>2.0.0</version>
 
   <description>
    Various helper utilities not associated with a particular stack
   </description>
 
   <maintainer email="spuetz@uos.de">Sebastian Pütz</maintainer>
+  <maintainer email="amock@uos.de">Alexander Mock</maintainer>
 
   <license>BSD, GPL</license>
 
   <url>http://ros.org/wiki/uos_tools</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <run_depend>uos_common_urdf</run_depend>
-  <run_depend>uos_diffdrive_teleop</run_depend>
-  <run_depend>uos_freespace</run_depend>
-  <run_depend>uos_gazebo_worlds</run_depend>
-  <run_depend>uos_maps</run_depend>
+  <!-- TODO: comment them in once they are ported to ROS2 -->
+  <!-- <run_depend>uos_diffdrive_teleop</run_depend> -->
+  <!-- <run_depend>uos_freespace</run_depend> -->
+  <!-- <run_depend>uos_gazebo_worlds</run_depend> -->
+  <!-- <run_depend>uos_maps</run_depend> -->
   
   <export>
-    <metapackage/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

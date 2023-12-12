@@ -1,25 +1,22 @@
-# Catkin User Guide: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/user_guide.html
-# Catkin CMake Standard: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/standards.html
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(uos_common_urdf)
-# Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS urdf xacro gazebo_plugins)
 
-catkin_package(
-    CATKIN_DEPENDS urdf xacro gazebo_plugins
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+find_package(urdf REQUIRED)
+find_package(xacro REQUIRED)
+find_package(gazebo_plugins REQUIRED)
+
+install(DIRECTORY urdf meshes
+  DESTINATION share/${PROJECT_NAME}
 )
 
-install(FILES
-    common.xacro
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+ament_export_dependencies(xacro)
+ament_export_dependencies(urdf)
+ament_export_dependencies(gazebo_plugins)
 
-install(DIRECTORY
-    meshes/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/meshes
-)
-
-install(DIRECTORY
-    urdf/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
-)
+ament_package()
