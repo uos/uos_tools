@@ -24,29 +24,38 @@
 #ifndef UOS_DIFFDRIVE_TELEOP_H
 #define UOS_DIFFDRIVE_TELEOP_H
 
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
+
+
 #include <algorithm>
+
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+
 
 #define EPSILON_VELO 1e-3
 
-class Teleop
+class Teleop : public rclcpp::Node
 {
+  using Base = rclcpp::Node;
   private:
-    ros::Publisher vel_pub;
-    ros::Timer vel_timer;
-    ros::Timer key_timer;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_pub;
+
+    rclcpp::TimerBase::SharedPtr vel_timer;
+    rclcpp::TimerBase::SharedPtr key_timer;
   
     double update_inputs_rate;
     double update_velocity_rate;
 
-    void updateVelocity(const ros::TimerEvent &t_event);
-    void updateInputs(const ros::TimerEvent &t_event);
+    void updateVelocity();
+    void updateInputs();
+
+    // implement this!
+    virtual void readInputs() = 0;
 
     double max_vel;
     double max_rot_vel;
     
-    geometry_msgs::Twist vel_cmd;
+    geometry_msgs::msg::Twist vel_cmd;
 
     struct acceleration{
       double pos;
@@ -72,7 +81,6 @@ class Teleop
       double left;
     };
 
-    
     double adaptVelocity( 
         double time_delta,
         double velocity,
@@ -83,10 +91,9 @@ class Teleop
 
   protected:
     inputs in;
-    ros::NodeHandle n_;
-
+    
   public:
-    Teleop();
+    Teleop(std::string node_name);
 };
 
 #endif /* uos_diffdrive_teleop.h */

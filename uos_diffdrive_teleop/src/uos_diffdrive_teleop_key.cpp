@@ -27,12 +27,13 @@
 int kfd = 0;
 struct termios cooked, raw;
 
-TeleopKeyboard::TeleopKeyboard(){
-  ros::NodeHandle n_private("~");
-  n_private.param("normal_x", normal_x, 0.5);
-  n_private.param("normal_y", normal_y, 0.5);
-  n_private.param("high_x", high_x, 1.0);
-  n_private.param("high_y", high_y, 1.0);
+TeleopKeyboard::TeleopKeyboard()
+:Teleop("uos_diffdrive_teleop_key")
+{
+  normal_x = this->declare_parameter("normal_x", 0.5);
+  normal_y = this->declare_parameter("normal_y", 0.5);
+  high_x = this->declare_parameter("high_x", 1.0);
+  high_y = this->declare_parameter("high_y", 1.0);
   
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
@@ -53,8 +54,9 @@ TeleopKeyboard::TeleopKeyboard(){
   puts("Press 'Shift' to run");
 }
 
-void TeleopKeyboard::readKeyboard()
+void TeleopKeyboard::readInputs()
 {
+  std::cout << "readInputs" << std::endl;
   c = 0;
   // get the next event from
   // the keyboard
@@ -63,6 +65,8 @@ void TeleopKeyboard::readKeyboard()
     perror("read():");
     exit(-1);
   }
+
+  std::cout << "bla" << std::endl;
 
   in.updated = true;
   
@@ -136,14 +140,38 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "uos_diffdrive_teleop_key");
-  TeleopKeyboard teleop;
-  signal(SIGINT,quit);
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
+  rclcpp::init(argc, argv);
+  std::cout << "HELLO!" << std::endl;
 
-  while(ros::ok()){
-    teleop.readKeyboard();
+  // TeleopKeyboard teleop;
+  // signal(SIGINT, quit);
+
+  std::cout << "Create node..." << std::endl;
+  auto node = std::make_shared<TeleopKeyboard>();
+  std::cout << "Node created!" << std::endl;
+
+  rclcpp::ExecutorOptions opts;
+  rclcpp::executors::MultiThreadedExecutor executor(opts, 2);
+  executor.add_node(node);
+  
+  std::thread executor_thread(
+    std::bind(&rclcpp::executors::MultiThreadedExecutor::spin,
+            &executor));
+
+
+  std::cout << "Spinning!" << std::endl;
+
+  while(rclcpp::ok())
+  {
+    std::cout << "Get KEY!" << std::endl;
+    node->readInputs();
   }
+
+  executor_thread.join();
+
+
+
+  rclcpp::shutdown();
+
   return EXIT_SUCCESS;
 }

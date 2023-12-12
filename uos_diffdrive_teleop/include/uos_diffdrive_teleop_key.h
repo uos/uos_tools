@@ -30,9 +30,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <uos_diffdrive_teleop.h>
-#include <sensor_msgs/Joy.h>
+#include <sensor_msgs/msg/joy.hpp>
 
 #define KEYCODE_A 0x61
 #define KEYCODE_D 0x64
@@ -50,11 +50,14 @@
 
 #define KEYCODE_SPACE 0x20
 
-class TeleopKeyboard : public Teleop
+class TeleopKeyboard 
+: public Teleop
 {
   public:
     TeleopKeyboard();
     void readKeyboard();
+
+    virtual void readInputs();
 
   private:
     char c;    

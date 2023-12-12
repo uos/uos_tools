@@ -24,11 +24,12 @@
 
 #include <uos_diffdrive_teleop.h>
 
-Teleop::Teleop(){
-  ros::NodeHandle n_private("~");
+Teleop::Teleop(std::string node_name)
+:Base(node_name)
+{
+  max_vel = this->declare_parameter("max_vel", 1.0); // max velocity
+  max_rot_vel = this->declare_parameter("max_rot_vel", 2.0); // max rot velocity
 
-  n_private.param("max_vel", max_vel, 1.0);           // max velocity
-  n_private.param("max_rot_vel", max_rot_vel, 2.0);   // max rot velocity
 
   // acc_ahead_* resp. acc_y.* describes the forwards/backwards part
   // acc_rot_* resp. acc_x.* describes the rotational part
@@ -43,30 +44,38 @@ Teleop::Teleop(){
   //    direction button
 
   //forward acceleration parameters
-  n_private.param("acc_ahead_pos", acc_y.pos, 0.4);
-  n_private.param("acc_ahead_neg", acc_y.neg, 0.8);
-  n_private.param("acc_ahead_stop", acc_y.stop, 2.0);
+  acc_y.pos = this->declare_parameter("acc_ahead_pos", 0.4);
+  acc_y.neg = this->declare_parameter("acc_ahead_neg", 0.8);
+  acc_y.stop = this->declare_parameter("acc_ahead_stop", 2.0);
 
   //rotational acceleration parameters
-  n_private.param("acc_rot_pos", acc_x.pos, 1.4);
-  n_private.param("acc_rot_neg", acc_x.neg, 1.8);
-  n_private.param("acc_rot_stop", acc_x.stop, 2.6);
+  acc_x.pos = this->declare_parameter("acc_rot_pos", 1.4);
+  acc_x.neg = this->declare_parameter("acc_rot_neg", 1.8);
+  acc_x.stop = this->declare_parameter("acc_rot_stop", 2.6);
 
   //update rates
-  n_private.param("update_velocity_rate", update_velocity_rate, 0.01);
-  n_private.param("update_inputs_rate", update_inputs_rate, 0.05);
+  update_velocity_rate = this->declare_parameter("update_velocity_rate", 0.01);
+  update_inputs_rate = this->declare_parameter("update_inputs_rate", 0.05);
   
-  vel_pub = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+  vel_pub = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 1);
 
-  vel_timer = n_.createTimer(ros::Duration(update_velocity_rate), &Teleop::updateVelocity, this);
-  key_timer = n_.createTimer(ros::Duration(update_inputs_rate),  &Teleop::updateInputs, this);
+  vel_timer = this->create_wall_timer(
+      std::chrono::duration<double>(update_velocity_rate), 
+      std::bind(&Teleop::updateVelocity, this));
+
+  key_timer = this->create_wall_timer(
+      std::chrono::duration<double>(update_inputs_rate), 
+      std::bind(&Teleop::updateInputs, this));
 
   velo.x = 0;
   velo.y = 0;
 }
 
-void Teleop::updateVelocity(const ros::TimerEvent &t_event){
-  ros::Duration delta = t_event.current_real - t_event.last_real;
+void Teleop::updateVelocity()
+{
+  // std::cout << "updateVelocity - start" << std::endl;
+  rclcpp::Duration delta = rclcpp::Duration::from_seconds(0.01);
+  // rclcpp::Duration delta = t_event.current_real - t_event.last_real;
   
   double left = in.left;
   double forwards = in.forwards;
@@ -76,8 +85,8 @@ void Teleop::updateVelocity(const ros::TimerEvent &t_event){
   forwards = std::min(1.0, forwards);
   forwards = std::max(-1.0, forwards);
 
-  velo.y = adaptVelocity(delta.toSec(), velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
-  velo.x = adaptVelocity(delta.toSec(), velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
+  velo.y = adaptVelocity(delta.seconds(), velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
+  velo.x = adaptVelocity(delta.seconds(), velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
 
   // velocity limits by intensity
   velo.dyn_limit_y = max_vel * forwards;
@@ -99,17 +108,25 @@ void Teleop::updateVelocity(const ros::TimerEvent &t_event){
 
   //publish command
   if(std::abs(vel_cmd.linear.x) > EPSILON_VELO || std::abs(vel_cmd.angular.z) > EPSILON_VELO) {
-    vel_pub.publish(vel_cmd);
+    vel_pub->publish(vel_cmd);
   }
   // TODO apply velocity by service call
+
+  // std::cout << "updateVelocity - end" << std::endl;
+
 }
 
-void Teleop::updateInputs(const ros::TimerEvent &t_event){
+void Teleop::updateInputs()
+{
+  // std::cout << "updateInputs - start" << std::endl;
+  // readInputs();
+
   if(!in.updated){
     in.forwards = 0;
     in.left = 0;
   }
   in.updated = false;
+  // std::cout << "updateInputs - end" << std::endl;
 }
 
 double Teleop::adaptVelocity(
