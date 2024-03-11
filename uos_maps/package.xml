@@ -1,6 +1,6 @@
 <package>
   <name>uos_maps</name>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
   <description>Navigation maps of the Osnabrueck University</description>
   <maintainer email="mguenthe@uni-osnabrueck.de">Martin Guenther</maintainer>
 

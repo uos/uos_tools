@@ -21,13 +21,6 @@ include_directories(
     include
 )
 
-# catkin_package(
-#     CATKIN_DEPENDS 
-#         roscpp 
-#         sensor_msgs 
-#         geometry_msgs
-# )
-
 # add_executable(uos_diffdrive_teleop_cyborgevo 
 #     src/uos_diffdrive_teleop_cyborgevo.cpp
 # )

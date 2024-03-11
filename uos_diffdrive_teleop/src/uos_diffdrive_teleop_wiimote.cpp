@@ -21,7 +21,7 @@
 double max_vel_x, max_rotational_vel;
 ros::Publisher vel_pub;
 
-void ps3joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   geometry_msgs::Twist vel;
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   nh_ns.param("max_rotational_vel", max_rotational_vel, 1.5);
 
   vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-  ros::Subscriber ps3joy_sub = nh.subscribe("joy", 10, ps3joyCallback);
+  ros::Subscriber joy_sub = nh.subscribe("joy", 10, joyCallback);
 
   ros::spin();
 }
