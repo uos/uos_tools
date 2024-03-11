@@ -1,6 +1,6 @@
 <package>
   <name>uos_gazebo_worlds</name>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
   <description>Gazebo world and model files for UOS.</description>
   <maintainer email="mguenthe@uni-osnabrueck.de">Martin Guenther</maintainer>
 

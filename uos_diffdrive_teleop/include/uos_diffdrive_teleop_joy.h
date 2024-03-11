@@ -16,14 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * uos_diffdrive_teleop_ps3joy.h
+ * uos_diffdrive_teleop_joy.h
  *
  *  Created on: 16.02.2015
  *      Author: Sebastian Pütz <spuetz@uos.de>
  */
 
-#ifndef UOS_DIFFDRIVE_TELEOP_PS3JOY_H
-#define UOS_DIFFDRIVE_TELEOP_PS3JOY_H
+#ifndef UOS_DIFFDRIVE_TELEOP_JOY_H
+#define UOS_DIFFDRIVE_TELEOP_JOY_H
 
 #include <ros/ros.h>
 #include <uos_diffdrive_teleop.h>
@@ -68,16 +68,16 @@
 #define PS3_AXIS_ACCELEROMETER_UP        18
 #define PS3_AXIS_GYRO_YAW                19
 
-class TeleopPS3 : public Teleop
+class TeleopJoy : public Teleop
 {
   public:
-    TeleopPS3();
+    TeleopJoy();
 
   private:
     ros::Subscriber joy_sub;
     bool use_button_pressure;    
-    void PS3Callback(const sensor_msgs::Joy::ConstPtr& joy);
+    void JoyCallback(const sensor_msgs::Joy::ConstPtr& joy);
 };
 
-#endif /* uos_diffdrive_teleop_ps3joy.h */
+#endif /* uos_diffdrive_teleop_joy.h */
 

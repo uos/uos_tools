@@ -7,7 +7,7 @@
   <maintainer email="spuetz@uos.de">Sebastian Pütz</maintainer>
   <maintainer email="amock@uos.de">Alexander Mock</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3</license>
 
   <url type="website">http://ros.org/wiki/uos_diffdrive_teleop</url>
 
@@ -26,4 +26,5 @@
   <export>
     <build_type>ament_cmake</build_type>
   </export>
+
 </package>
