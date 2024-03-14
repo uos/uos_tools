@@ -1,13 +1,8 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package>
-<<<<<<< HEAD
   <name>uos_tools</name>
   <version>2.0.0</version>
-=======
-  <name> uos_tools </name>
-  <version>1.0.2</version>
->>>>>>> 0b12326ec37edffac0799724cf2c8d54facd8129
 
   <description>
    Various helper utilities not associated with a particular stack
