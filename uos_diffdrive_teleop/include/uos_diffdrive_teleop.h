@@ -30,6 +30,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 
 
 #define EPSILON_VELO 1e-3
@@ -39,6 +40,7 @@ class Teleop : public rclcpp::Node
   using Base = rclcpp::Node;
   private:
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_pub;
+    rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr vel_pub_stamped;
 
     rclcpp::TimerBase::SharedPtr vel_timer;
     rclcpp::TimerBase::SharedPtr key_timer;
@@ -54,8 +56,11 @@ class Teleop : public rclcpp::Node
 
     double max_vel;
     double max_rot_vel;
+    bool    use_stamped_twist;
+    std::string cmd_frame;
     
     geometry_msgs::msg::Twist vel_cmd;
+    
 
     struct acceleration{
       double pos;

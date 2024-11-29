@@ -23,5 +23,8 @@
     <param name="acc_rot_pos" value="2.6"/>
     <param name="acc_rot_neg" value="2.8"/>
     <param name="acc_rot_stop" value="4.6"/>
+
+    <param name="use_stamped_twist" value="false" />
+    <param name="cmd_frame" value="base_link" />
 </node>
 </launch>

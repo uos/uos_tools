@@ -29,7 +29,9 @@ Teleop::Teleop(std::string node_name)
 {
   max_vel = this->declare_parameter("max_vel", 1.0); // max velocity
   max_rot_vel = this->declare_parameter("max_rot_vel", 2.0); // max rot velocity
+  use_stamped_twist = this->declare_parameter("use_stamped_twist", false);
 
+  cmd_frame = this->declare_parameter("cmd_frame", "base_link");
 
   // acc_ahead_* resp. acc_y.* describes the forwards/backwards part
   // acc_rot_* resp. acc_x.* describes the rotational part
@@ -57,7 +59,12 @@ Teleop::Teleop(std::string node_name)
   update_velocity_rate = this->declare_parameter("update_velocity_rate", 0.01);
   update_inputs_rate = this->declare_parameter("update_inputs_rate", 0.05);
   
-  vel_pub = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 1);
+  if(use_stamped_twist)
+  {
+    vel_pub_stamped = this->create_publisher<geometry_msgs::msg::TwistStamped>("cmd_vel", 1);
+  } else {
+    vel_pub = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 1);
+  }
 
   vel_timer = this->create_wall_timer(
       std::chrono::duration<double>(update_velocity_rate), 
@@ -107,8 +114,19 @@ void Teleop::updateVelocity()
   vel_cmd.angular.z = velo.x;
 
   //publish command
-  if(std::abs(vel_cmd.linear.x) > EPSILON_VELO || std::abs(vel_cmd.angular.z) > EPSILON_VELO) {
-    vel_pub->publish(vel_cmd);
+  if(std::abs(vel_cmd.linear.x) > EPSILON_VELO || std::abs(vel_cmd.angular.z) > EPSILON_VELO) 
+  {
+    if(use_stamped_twist)
+    {
+      geometry_msgs::msg::TwistStamped vel_cmd_stamped;
+      vel_cmd_stamped.twist = vel_cmd;
+      vel_cmd_stamped.header.stamp = this->now();
+      vel_cmd_stamped.header.frame_id = cmd_frame;
+      vel_pub_stamped->publish(vel_cmd_stamped);
+    } else {
+      vel_pub->publish(vel_cmd);
+    }
+    
   }
   // TODO apply velocity by service call
 
