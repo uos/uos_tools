@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
+<arg name="stamped" default="true" description="publish stamped or not-stamped twist" />
+
 <!-- launch-prefix="xterm -e" -->
 <node pkg="uos_diffdrive_teleop" 
     exec="uos_diffdrive_teleop_key" 
@@ -24,7 +26,7 @@
     <param name="acc_rot_neg" value="2.8"/>
     <param name="acc_rot_stop" value="4.6"/>
 
-    <param name="use_stamped_twist" value="false" />
+    <param name="use_stamped_twist" value="$(var stamped)" />
     <param name="cmd_frame" value="base_link" />
 </node>
 </launch>
