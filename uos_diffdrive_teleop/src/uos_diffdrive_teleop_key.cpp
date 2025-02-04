@@ -130,7 +130,7 @@ void TeleopKeyboard::readKeyboard()
       break;
     default:
       in.forwards *= 0.4;
-      in.left *= 0.4;
+      in.left *= 0.2;
       in.updated = false;
   }
 }
