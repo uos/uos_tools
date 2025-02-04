@@ -60,7 +60,6 @@ class Teleop : public rclcpp::Node
     std::string cmd_frame;
     
     geometry_msgs::msg::Twist vel_cmd;
-    
 
     struct acceleration{
       double pos;
@@ -80,7 +79,7 @@ class Teleop : public rclcpp::Node
 
     
     // inputs elem of [0 1]
-    struct inputs{
+    struct inputs {
       bool updated;
       double forwards;
       double left;

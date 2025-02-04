@@ -80,10 +80,8 @@ Teleop::Teleop(std::string node_name)
 
 void Teleop::updateVelocity()
 {
-  // std::cout << "updateVelocity - start" << std::endl;
-  // rclcpp::Duration delta = rclcpp::Duration::from_seconds(update_velocity_rate);
-  // rclcpp::Duration delta = t_event.current_real - t_event.last_real;
-  
+  // const bool inputs_vanished = in_last.updated && !in.updated;
+
   double left = in.left;
   double forwards = in.forwards;
 
@@ -92,30 +90,40 @@ void Teleop::updateVelocity()
   forwards = std::min(1.0, forwards);
   forwards = std::max(-1.0, forwards);
 
-  velo.y = adaptVelocity(update_velocity_rate, velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
-  velo.x = adaptVelocity(update_velocity_rate, velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
-
   // velocity limits by intensity
   velo.dyn_limit_y = max_vel * forwards;
   velo.dyn_limit_x = max_rot_vel * left;
 
+  if(in.updated)
+  { 
+    velo.y = adaptVelocity(update_velocity_rate, velo.y, forwards, acc_y.stop, acc_y.neg, acc_y.pos);
+    velo.x = adaptVelocity(update_velocity_rate, velo.x, left, acc_x.stop, acc_x.neg, acc_x.pos);
+  }
+
   // observe the limits for the forward part
   if((forwards < 0 && velo.y < velo.dyn_limit_y)
       || (forwards > 0 && velo.y > velo.dyn_limit_y))
+  {
     velo.y = velo.dyn_limit_y;
+  }
 
   // observe the limits for the rotational part
   if((left < 0 && velo.x < velo.dyn_limit_x)
       || (left > 0 && velo.x > velo.dyn_limit_x))
-    velo.x = velo.dyn_limit_x;
-
-  // set command 
-  vel_cmd.linear.x = velo.y;
-  vel_cmd.angular.z = velo.x;
-
-  //publish command
-  if(std::abs(vel_cmd.linear.x) > EPSILON_VELO || std::abs(vel_cmd.angular.z) > EPSILON_VELO) 
   {
+    velo.x = velo.dyn_limit_x;
+  }
+
+  // std::cout << "IN -> velo: " << in.forwards << " " << in.left << " -> " << velo.y << " " << velo.x << std::endl;
+
+  const bool small_velo = abs(velo.y) < EPSILON_VELO && abs(velo.x) < EPSILON_VELO;
+  if(in.updated || !small_velo)
+  {
+    // if recent updates were received or residual ego-velo is still high enough
+    // set command 
+    vel_cmd.linear.x = velo.y;
+    vel_cmd.angular.z = velo.x;
+    
     if(use_stamped_twist)
     {
       geometry_msgs::msg::TwistStamped vel_cmd_stamped;
@@ -126,25 +134,12 @@ void Teleop::updateVelocity()
     } else {
       vel_pub->publish(vel_cmd);
     }
-    
   }
-  // TODO apply velocity by service call
-
-  // std::cout << "updateVelocity - end" << std::endl;
-
 }
 
 void Teleop::updateInputs()
 {
-  // std::cout << "updateInputs - start" << std::endl;
-  // readInputs();
-
-  if(!in.updated){
-    in.forwards = 0;
-    in.left = 0;
-  }
-  in.updated = false;
-  // std::cout << "updateInputs - end" << std::endl;
+  
 }
 
 double Teleop::adaptVelocity(
@@ -160,27 +155,37 @@ double Teleop::adaptVelocity(
 
   if(factor != 0) {
     if(factor > 0) {
-      // active decelerate
       if(velocity < 0)
+      {
+        // active decelerate
         return (new_velocity += acc_stop * factor * delta_time) > -EPSILON_VELO ? 0 : new_velocity;
-      // accelerate
+      }
       else 
+      { // accelerate
         return new_velocity + acc_pos * factor * delta_time;
+      }
     } else {
-      // active decelerate
       if(velocity > 0)
+      { // active decelerate
         return (new_velocity += acc_stop * factor * delta_time) < EPSILON_VELO ? 0 : new_velocity;
-      // accelerate
+      }
       else
+      { // accelerate
         return new_velocity + acc_pos * factor * delta_time;
+      }
     }
   }
-  else {
+  else 
+  {
     // nothing pressed -> decelerate
     if(velocity > 0)
+    {
       return (new_velocity += -acc_neg * delta_time) < EPSILON_VELO ? 0 : new_velocity;
+    }
     else if(velocity < 0)
+    {
       return (new_velocity += acc_neg * delta_time) > -EPSILON_VELO ? 0 : new_velocity;
+    }
     return 0;
   }
 }

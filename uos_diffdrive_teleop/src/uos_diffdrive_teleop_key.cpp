@@ -51,6 +51,7 @@ TeleopKeyboard::TeleopKeyboard()
   puts("Use 'WS' to translate");
   puts("Use 'AD' to yaw");
   puts("Use 'QE' to translate and yaw");
+  puts("Use 'Space' to break");
   puts("Press 'Shift' to run");
 }
 
@@ -96,7 +97,10 @@ void TeleopKeyboard::readKeyboard()
       in.forwards = normal_y;
       in.left = -normal_x;
       break;
-
+    case KEYCODE_SPACE:
+      in.forwards = 0;
+      in.left = 0;
+      break;
     // Running 
     case
       KEYCODE_W_CAP:
@@ -125,6 +129,8 @@ void TeleopKeyboard::readKeyboard()
       in.left = -high_x;
       break;
     default:
+      in.forwards *= 0.4;
+      in.left *= 0.4;
       in.updated = false;
   }
 }
